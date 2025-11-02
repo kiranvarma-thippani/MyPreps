@@ -1,0 +1,49 @@
+public class Summations {
+	public static void main(String[] args)
+	{
+		//=============================================
+		List<Integer> numbers=Arrays.asList(1,4,3,4,10,11,18);
+		int l=numbers.stream().mapToInt(Integer::intValue).sum();
+		System.out.println("sum= "+l);
+		
+		/*Here the Integer stream of objects are converted into primitive intStream using mapToInt(Integer::intValue)and mainly
+		 for calculating the min, sum, average, max which areS not available on Stream<Integer> Object*/
+		
+		//Integer::intVlaue mainly converts the Integer Object value to the int value
+		//Integer::valueOf() will convert the incoming stream to Stream<Integer>
+		/*Integer::valueOf is a static method that converts:
+            1. a primitive int to an Integer object
+            2. or a String to an Integer object */
+		//mapToObj in case primitive int to Integer object.
+		//map(Integer::valueOf) or map(Integer::parseInt)
+		//==============================================
+	  
+		List<Integer> sorted=numbers.stream().sorted(Comparator.comparing(Integer::intValue).reversed())
+		.collect(Collectors.toList());
+		System.out.println("Sorted Collection "+sorted);
+		
+		/*Here we sort using the sorted() method, if the incoming object implements the comparable then its
+		 * sorted without any comparator requirement. But for the custom objects we should specify it. 
+		 * for primitive data types, we use sorted().reversed and for Object types we should pass the COmparator
+		 * object inside the sorted method and for reversal use Collections.reverse(comparator) and do it
+		 * 
+		 * SImilary for max() and min() for primitive data types, we should use the direct methods but for
+		 * all the object types we should definitly pass the comparator and we do also have that comparator.comparing,
+		 * comparingLong and comparingFloat methods also in java 9. Use those use nulls also.
+		 * for all the summations, averages, min and max calculations it gives the optional out put. 
+		 * use skip for skipping the numbers and limit is to place the limit and findfirst is to return the first
+		 * elemen in the list. So thats all for this pdf
+		
+		 * */
+		
+		//=============================================================
+		double i=numbers.stream().mapToInt(Integer::intValue).average().getAsDouble();
+	    double numberList=numbers.stream()
+				.filter(s->s%2==0).mapToInt(j->j*j).average().getAsDouble();
+		System.out.println(numberList);
+		
+		 //maximum
+		 int z=numbers.stream().max(Comparator.comparingInt(Integer::valueOf)).get();
+		System.out.println(z);
+	}
+}
