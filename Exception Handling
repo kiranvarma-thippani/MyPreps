@@ -1,0 +1,142 @@
+Exception Handling in java
+
+Exception is an event which disrupts the normal flow of progream and halts the program execution. Basically this exception occurs
+due to abnormality in the program. Exception is a object contains the info about the exception created by jvm and throws when an exception
+occurs and if it is not handled properly then the program gets terminated.
+
+There are two types of exceptions in jave:
+1. Checked Exception.
+2. Unchecked Exception.
+3. Error
+
+Checked Exception:
+The Exception which are checked at compile time by the compiler is said to be checked exception. Basically compiler enforces us to
+provide the exception handling logic or to declare the exception that it throws:
+
+Unchecked Exceptions:
+These exceptions are not caught during the compile time. These type of exceptions basically occur during the execution of program.
+These occur due to the error in the programming logic or improper use of the API etc.
+
+Hierarchy:
+==========
+
+=> All the exceptions are the subclasses of the Exception class
+=> The Exception class is the subclass of throwable class.
+=>Error is also the subclass of throwable class.
+
+Exception class has two subclasses they are: 
+1. Checked Exception
+2. Unchecked Exception.
+
+
+Important Methods of throwable class:
+
+getMessage(): Returns a detailed message about the exception that has occurred. This message is initialized in the Throwable constructor.
+public Throwable getCause(): Cause of the exception.
+public String toString(): returns the class concatinated with the message of the exception.
+printStackTrace(): prints the message and stacktrace.
+ 
+ A stack trace in Java is a report that shows the sequence of method calls that led to an exception being thrown. It helps developers understand
+ where and why an error occurred in the code.
+ 
+ =>Exceptions handled using try, catch, finally block. every try should have catch or finally block(usually for closing resources).
+ => the code prone to throw an exception is placed in try block and handled in catch block. irrespective of error handling finally  executes.
+ 
+=> If finally block itself throws exception then the exceptions in try and catch blocks are overridden.
+=> For every try block there can be multiple catches. Each catches will having a specific exception handling logic. The exceptions in the 
+catch block should be decreasing in heirarchy else compiler throw exception like unreachable coe.
+
+
+Throw vs Throws:
+============
+1. If a method does not handle the checke exception it atleast should be declared in the method declaration. We can have declare multiple 
+exceptions for the same method using throws keyword. It just postpones the exception handling.
+2. Throw keyword is used to throw a particular exception explicitly. This is very useful while throwing the custom exceptions in java.
+
+Important Points:
+-> No catch without try.
+>Finally is compuslion when you have try/catch
+-> try should contain a catch or finally block compulsory
+-> No other code in between these try ,catch blocks and finally blocks.
+
+try-with-resources, also referred as automatic resource management, is a new exception handling mechanism that was introduced in Java 7, 
+which automatically closes the resources used within the try catch block.
+
+To use this statement, you simply need to declare the required resources within the parenthesis, and the created resource will be closed 
+automatically at the end of the block.
+
+Rules of Try-With-Resources
+
+1. Resource must implement AutoCloseable or Closeable interface.
+
+Examples: FileInputStream, BufferedReader, Connection, etc.
+
+2. Resources are declared inside the parentheses of the try block.
+
+3. Java will automatically close them when the block exits (even if an exception occurs).
+
+4. You can declare multiple resources separated by semicolons.
+
+
+Built in Compile time exceptions:
+
+1. IO
+2. SQl
+3. File Not Found
+4. Class Not found.
+5. Interrupted Exception
+6. ParseException.
+7. NoSuchMethodException
+8. InstantiationException
+9. NoSuchFieldException
+
+Built in Runtime Exception:
+1. Null Pointer Exception.
+2. ArrayIndexOutOfBounds
+3. Arithmetic Exception.
+4. IllegalArguementException.
+5. IllegalStateException
+6. NumberFormatException improper string to number  conversion
+7. UnsupportedOperationException.
+8. ConcurrentModificationException.
+
+
+Imp points for try wit resources:
+===================================
+To use a class with try-with-resources statement it should implement AutoCloseable interface and the close() method of it gets invoked automatically at runtime.
+
+You can declare more than one class in try-with-resources statement.
+
+While you declare multiple classes in the try block of try-with-resources statement these classes are closed in reverse order.
+
+Except the declaration of resources within the parenthesis everything is the same as normal try/catch block of a try block.
+
+The resource declared in try gets instantiated just before the start of the try-block.
+
+The resource declared at the try block is implicitly declared as final.
+
+
+Call stack:
+The call stack is a runtime structure used by the Java Virtual Machine (JVM) to keep track of method calls.
+🧠 Think of it like:
+A stack of method calls — when a method is called, it's pushed onto the stack; when it finishes, it's popped off.
+
+Use of call stack:
+-------------------
+Keeps track of which method is currently executing.
+Helps the JVM know where to return after a method finishes.
+
+Keeps track of which method is currently executing.
+Helps the JVM know where to return after a method finishes.
+
+Stack trace:
+------------
+A stack trace is a snapshot of the call stack at the moment an exception occurs. It shows the sequence of method calls
+that led to the error.
+Helps debug by showing where the error happened and how the program got there.
+Used in logs and error messages.
+====================
+
+
+
+Refer to Exception handling with interface(inheritances) etc
