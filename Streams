@@ -47,3 +47,186 @@ public class Summations {
 		System.out.println(z);
 	}
 }
+
+Stream Methods in java:
+
+Stream.of(elements); --> Direct Stream creation using elements.
+Arrays.Stream(array); --> Stream using Array.
+List.stream(), set.stream()--> Streams from set and list.
+Stream.empty() --> empty stream.
+Stream.builder().add(object obj).add(Object obj).add(Object obj).build will create a stream.
+
+
+Stream Pipeline-> we can build the stream pipeline with stream + intermediate Operation+ Terminal Operation.
+
++> Whenever we apply the intermediate operation on the stream object it will give again a stream object with applied function on it.
+=> Hence we can call many intermediate methods on the same stream object as chain of methods.
+=> This is called methods pipelined on the source stream.
+=> Intermediate operations only start executing only when the terminal operation is started.
+=> We can call only one terminal method on one stream instance. When we call the terminal method, we will get the result of 
+the pipelined intermediate methods.
+=> Dont use the sane stream everytime that means we cannot use one stream again and againx
+
+Initialisation methods:
+
+.of()
+Arrays.stream().
+list.stream();
+
+Intermediate methods:
+
+1. map(Function)
+2. filter(predicate)
+3. sorted()
+4. distinct()
+5. maptoDouble()
+6. mapToInt()---> Integer::intValue conversion object to intstream., Integer::valueOf() ---> Use in comparator instances
+7. mapToFloat()-> same
+8. limit(n) from begining to n numbers.
+9. skip(n) skip the first n numbers.
+10. flatmap(List::Stream)
+11. peek() u
+
+Terminals:
+==========
+1. allmatch(predicate)
+2. anymatch(predicate)
+3. findfirst()
+4. findany()
+5. collect()
+
+
+
+map and flatmap:
+
+map is used to transform each element in a stream. It takes a function and applies it to every element, 
+returning a new stream with the transformed elements.
+
+latMap is used when each element might itself be a stream or collection, and you want to flatten those 
+into a single stream.
+
+Use map:
+=========
+You want to transform each element of the stream into another form.
+The transformation returns a single value per element.
+You’re not dealing with nested structures.
+
+Use flatmap when deal with nested structures. it creates a stream for each element and then flattens. Stream<string
+
+
+Sorted()
+sorted()-> when the object class implements the comparable interface, then we will use method
+sorted(Comparator)-> Should pass a comparator for custom sorting. 
+1. pass a lambda expression if you want to have the customised and having full control on the customisation.
+2. Comparator.comparing(key)-> based on the key it will sort, it will return a comparator object.
+3. thencomparing()-> chaining. this can be applied only on the Comparator refernece variable.
+
+sorted(Comparator.comparinng(Employye::getSalary) will sorts the stream of objects in ascending order and gives you a new
+stream.
+sorted(Collections.reverseOrder(Comparator.comparing(Employee::getSalary))) reverses the sorting order.
+
+
+Max()
+=====
+If its integer or float or long or double stream then directly use max().
+
+If its User defined classes like employees then you should mention the comparator and in which on what param to calculate the min and max()
+
+EmployeeList.stream().max(Comparator.comparingDouble(Employee::getSalary).
+
+It returns a optional class.
+
+Similary for the min() as well.
+
+==========
+
+Collectors.groupingBy and Collectors.mapping(),Collectors.counting.
+
+Terminal Operation Methods:
+===========================
+1. collect(Collectors)==> Collects the stream data after the intermediate opertions.
+
+Collectors is having a lot utility functions in stream api here they are:
+
+Colectors.toList()
+
+
+Collects elements into a Map. Overloads:
+- toMap(keyMapper, valueMapper)
+- toMap(keyMapper, valueMapper, mergeFunction)
+- toMap(keyMapper, valueMapper, mergeFunction, mapSupplier)
+
+
+- joining()
+- joining(delimiter)
+- joining(delimiter, prefix, suffix)
+
+groupingBy(classifier)
+- groupingBy(classifier, downstream)
+- groupingBy(classifier, mapFactory, downstream)
+
+Partitions elements by a predicate. Overloads:
+- partitioningBy(predicate)
+- partitioningBy(predicate, downstream)
+
+
+statiscts
+IntSummaryStatistics stats = stream.collect(Collectors.summarizingInt(String::length));
+
+
+- reducing(identity, accumulator)
+- reducing(identity, mapper, accumulator)
+
+int total = stream.collect(Collectors.reducing(0, String::length, Integer::sum));
+
+
+mapping()
+Applies a mapping function before collecting.
+Example:
+List<Integer> lengths = stream.collect(Collectors.mapping(String::length, Collectors.toList()));
+
+
+collectingAndThen()
+Applies a finishing transformation after collecting.
+Example:
+List<String> unmodifiable = stream.collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+
+First Non Repeating character in the string:
+ 1.use the condition s.IndexOf()==s.lastIndex()
+
+Find the first repeating characters in the string;
+String s = "yourStringHere";
+Map<Character, Long> charMap = s.chars()
+    .mapToObj(c -> (char) c)
+    .collect(Collectors.groupingBy(
+        Function.identity(),
+        LinkedHashMap::new,
+        Collectors.counting()
+    ));
+
+char ans = charMap.entrySet().stream()
+    .filter(m -> m.getValue() > 1)
+    .map(Map.Entry::getKey)
+    .findFirst()
+    .get();
+
+System.out.println(ans);
+
+STreamAPI.java
+
+	Integer[] arr= {2,3,10,14,20,24,30,34,40,44,50,54};
+	List<Integer> list=Arrays.asList(arr);
+	Map<Integer,List<Integer>> segregate=list.stream().collect(Collectors.groupingBy(x->x/10*10));
+	System.out.println(segregate);
+	
+String Regex:
+1. \\d+ any digit matching 1 or more, *=> 0 or more, ?=>0 or 1.
+2. \\w+ any character a-z,A-Z,0-9, +
+3. ^ starts with
+4. $ ends with
+5. [a-zA-z] consists of a-z, + 1 or more matches
+6. [0-9]+ one digit or more digit matches.
+7. . -> matches dot.
+8. @ matches @symbol
+9. \w{2,} atleast 2 characters matches
+10. [^a-d 
