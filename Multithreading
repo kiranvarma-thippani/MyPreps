@@ -1,0 +1,406 @@
+what is a process?
+
+Process is an instance of the program that is being executed. It has its own memory space, resource and execution context.
+
+What is a thread?
+
+A thread is the smallest unit of execution within a process. A process can have multiple threads, which share the same 
+resources but can run independently.
+
+what is multitasking?
+
+Its the process of running multiple tasks simultaneously. On single core processor, the os make use of rapid context switching
+by make using of timely share of cpu time. If a processor is having multiple cores then the multiple cores will run simultaneously.
+
+Both threads and processes can run in true parallel on different cores, with the OS scheduler distributing tasks across the cores to 
+optimize performance.
+
+What is multitasking?
+
+Its the ability to execute the multiple threads within a single process concurrently.
+
+In single core,
+Both the processes and threads are managed by thread scheduler through time slicing and context switichinh.
+
+time slicing: dividing the cpu time into equal time intervals called time slices . These time slices are alloted to different
+process and threads by os schuduler.
+
+Context switiching: when the time slice expires for a thread or process then the os scheduler saves the state of the current
+thread and loads the info of next thread or process and shifts the CPU focus to the next process.
+
+This process happens in the fraction of seconds and the cpu mimics the multi threading process in this way.
+
+In Java, multithreading is the concurrent execution of two or more threads to maximize the utilization of the CPU. 
+
+-> Java .lang package.
+
+JVM can distribute the threads across multiple cores and execute the threads concurrently thus maximisng the CPU utilization.
+
+
+Main Thread:
+=========
+At the start up of Java Application, the main thread starts which is responsible for executing the main thread.
+
+To create a new thread there are two ways:
+
+1. Thread class.
+2. Runnable Interface
+
+Thread class:
+=============
+1.The class should extend the thread class.
+2. Run method is overriden to define the code that should be execute by the newly created thread.
+3. invoke the start method to start the thread.
+
+package ThreadCreation;
+
+class Task extends Thread{
+	
+	@Override
+	public void run() {
+		for(int i=0;i<100;i++) {
+			System.out.println(Thread.currentThread().getName()+" "+i);
+		}
+	}
+}
+
+public class World {
+	public static void main(String[] args) throws InterruptedException {
+		Task t1=new Task();
+		t1.start();
+		for(int i=0;i<100;i++) {
+		System.out.println(Thread.currentThread().getName()+" "+i);
+		}
+	}
+}
+
+Here, we create the thread and call it. Both the main and the app thread executes parallely.
+
+If we call start method of the thread, it internally calls the run method which will be started in another thread, if we call
+run method, it will be running in the main  thread itself.
+
+Using Runnable interface:
+
+1. Class should implement the runnable interface and provide the implementation for the run method in java.
+2. Create a thread class object and  Pass the object of the class implementing the runnable interface inside the constructor of
+of thread object.
+3. Start method is called to initiate the task in the new thread.
+
+Use case of Thread class creation Extending Thread:
+
+Use this for simple thread tasks and if you dont extend any other classes other than the thread class.
+1. When the thread logic is tightly coupled with thread.
+2. when you dont want to extend any other tasks.
+3, when you want to access the thread methods directly
+
+1. No flexibility.no reusability
+2. Not permits the class extension as there is no multiple inheritance in java.
+3. Not compatible with threadpools.
+4, Tightly coupled with the class.\\\
+
+
+Thread creation using Runnable interfaces.
+1. Flexible.
+2. Compatible working with exxecutor framework.
+3. The implementing class can also extend other class as well.
+4. Thread control and task is separated.Runnable separates task logic from thread control, 
+making your code cleaner and more maintainable.
+5. You can pass the same Runnable instance to multiple threads or executors.
+
+no direct access, thread should be created for this and we should pass runnable interface.
+
+"Using Runnable is preferred in professional Java development because it promotes clean design, 
+supports inheritance, and integrates well with modern concurrency tools like ExecutorService. While extending Thread is s
+impler, it's less flexible and not suitable for scalable applications."
+
+
+Thread Life Cycle in Java
+===============================
+A thread in Java goes through five main states as defined by the Thread.State enum:
+
+1. New
+
+The thread is created but not yet started.
+You’ve instantiated the thread using new Thread(), but haven’t called start() yet.
+
+JavaThread t = new Thread(); // NEW stateShow more lines
+
+2. Runnable
+
+The thread is ready to run and waiting for CPU time.
+After calling start(), the thread enters this state.
+It may be running or waiting in the queue depending on the OS scheduler.
+
+Javat.start(); // RUNNABLE stateShow more lines
+
+3. Running (not an official state in Java API, but conceptually useful)
+
+The thread is actively executing its run() method.
+Java doesn’t define this as a separate state — it’s part of Runnable.
+
+
+4. Blocked / Waiting / Timed Waiting
+These are intermediate states where the thread is not running but waiting for some condition:
+🔹 Blocked
+
+Waiting to acquire a lock (e.g., in synchronized code).
+
+🔹 Waiting
+
+Waiting indefinitely for another thread to signal (e.g., using wait()).
+
+🔹 Timed Waiting
+
+Waiting for a specified time (e.g., sleep(), join(timeout), wait(timeout)).
+
+
+5. Terminated (Dead)
+
+The thread has finished execution or was abruptly stopped due to an exception.
+It cannot be restarted.
+
+Use Runnable when you want to separate the task from the thread, allowing the class to extend another class if needed. 
+Extend Thread if you need to override Thread methods or if the task inherently requires direct control over the thread 
+itself, though this limits inheritance.
+
+join( ): 
+The join() method is used to pause the execution of the current thread until the thread on which join() was called finishes its execution.
+To ensure one thread completes before another starts or continues.
+Useful when you have dependent tasks — one thread must finish before the next can proceed.
+
+"join() is used to coordinate thread execution. It helps ensure that one thread completes before another continues, 
+which is useful in scenarios where tasks are dependent on each other."
+
+The setPriority() method is used to set the priority level of a thread. It helps the thread scheduler decide which thread to run first 
+when multiple threads are ready to execute.
+
+However it just gives the hint to the os scheduler, decison will be taken by the os scheduler.
+
+The interrupt() method is used to signal a thread that it should stop what it’s doing and do something else, 
+typically terminate or handle interruption gracefully. It doesn’t forcibly stop the thread — it just sets an internal flag (interrupted status) that the thread can check.
+
+1. interrupt() Signals the thread to interrupt
+2. isInterrupted() Checks if the thread was interrupted
+3. Thread.interrupted() Checks and clears the interrupted status
+
+=>If a thread is in sleep(), wait(), or join(), calling interrupt() will cause it to throw an InterruptedException.
+
+Synchronisation:
+"Synchronization ensures that only one thread accesses a shared resource at a time, preventing race conditions. 
+It’s essential for thread safety but must be used carefully to avoid deadlocks and performance issues."
+
+Synchronisation can be achieved using
+1. Synchronized method. on method level
+2. Synchronized block. on block(this) improves the performance
+3. Static Synchronization. on method
+
+
+The synchronised keyword is used to provide the basic synchronisation in java. But it has many drawbacks.
+It has only one object monitor and works with basic wait and notify method. If at all ifa thread doesnot release the lock
+the threads which are waiting for the lock will be waiting idnefinity this leads to dead locks and also there is not
+try lock mechanims and no multiple condition variable to work with.
+
+Reentrant Locks in java:
+
+* Its an explicit lock which enable your thread to enter or aquire the same lock multiple times without blockinh. 
+* Its provides flexibility like even aquring the lock can also be done on our choice, using lock method.
+* we can ensure the thread fair ness using locks.
+* we can also perform the locking mechanism with out blocking indefinitely by using the trylock(_)
+* lock.trylock it tries to acquire the lock immediately, if its acquired it returns true else returns false. This is useful
+when you want to your thread to acquire a lock, if its not done, then let your thread to exeute some other tasks.
+* It provides multiple condition variables to check with for locking.
+
+ometimes, threads need to wait for different conditions to be true before they can proceed. This is where Condition 
+variables come in.With ReentrantLock, you can create multiple Condition objects, each representing a different wait 
+condition.
+
+The synchronized keyword in Java provides basic thread-safety but has limitations: it locks the entire method or block, 
+leading to potential performance issues. It lacks a try-lock mechanism, causing threads to block indefinitely, increasing 
+the risk of deadlocks. Additionally, synchronized doesn't support multiple condition variables, offering only a single 
+monitor per object with basic wait/notify mechanisms. In contrast, explicit locks (Lock interface) offer finer-grained 
+control, try-lock capabilities to avoid blocking, and more sophisticated thread coordination through multiple condition 
+variables, making them more flexible and powerful for complex concurrency scenarios.
+
+lock() -> used by thread to acquire the lock. waits indefinitely.
+trylock()-> thread will try to acquire the lock immediatley if the lock is not available return false goes with the 
+execution of any other tasks if there are any.
+trylock(timeout)-> Thread waits for a period of time to acquire the lock. It acquires and return true if it acquire the lock. if not,
+the lock will wait till the tmeout and continue with other works. This will ensures that the thread wont wait for the lock 
+indefinitley.
+unlock() thread releases the lock using this method. ALways use the method in finally block. so irrespective of any exce[tion
+thrown the lock will be released.
+
+lockinteruptibly(); This method works in a way such that the thread will be ready to acquire the lock. but during waiting
+period if the interrupt is invoked on it. It will stop executing and throw an interrupted exception
+
+
+ReentrantReadWriteLock is a class in java.util.concurrent.locks that provides two types of locks:
+
+Read Lock (readLock()) – Allows multiple threads to read simultaneously as long as no thread is writing.
+Write Lock (writeLock()) – Allows only one thread to write, and blocks all readers and writers until it's released.
+
+Deadlock is a situation in multithreaded programming where two or more threads are blocked forever, each waiting for 
+the other to release a lock.
+
+Example in sts:
+
+Thread Communication:
+Share flag should be there to simulate the wait and modify scenario.
+
+
+===================================
+Executor framework was introduced in java5 in order to simpliy the development of the multithreaded applications by
+abstracting the complexities involved in creating and managing the threads.
+
+Initially the main thread will start execution and when we create and submit few tasks to the executor service using submit
+or whatever it might be. SO what happens here these tasks will be executed on the threads taken from thread. 
+
+Key feautures:
+----------------
+-> Thread Reusability.
+-> Created and managed on its own.
+-> Efficient usage of resources.
+-> Error handling.
+
+Interfaces 
+1. Executor
+2. ExecutorService
+
+1. Executor Interface consists of execute method which takes the run method which dont return anything
+
+2. ExecutorService:
+In this ExecutorService there will be a method called submit, which takes the accepts both runnable and callable interfacesinterface which will have a return
+type wrapped in future.
+
+It return the future object which consists of the status and also the result of the task.
+
+It consists of few methods likw:
+1. submit(runnable), submit(callable), submit(callable, result).
+2. shutdown: Used to shutdown the executor here it lets the existing tasks to run but will not accept new tasks.
+3. shutdownNow()Attempts to stop all actively executing tasks.Returns a list of tasks that were waiting to be executed.
+4. Attempts to stop all actively executing tasks.
+Returns a list of tasks that were waiting to be executed.
+
+7. isShutdown()
+
+Returns true if shutdown() or shutdownNow() has been called.
+
+8. isTerminated()
+
+Returns true if all tasks have completed after shutdown.
+
+9. awaitTermination(long timeout, TimeUnit unit)
+
+Blocks until all tasks complete or timeout occurs.
+
+ Consequences of Not Calling shutdown()
+
+
+Threads Keep Running
+
+=>The thread pool stays alive, waiting for new tasks.
+Even if your main program finishes, the JVM may not exit because the executor's threads are still active (they're non-daemon).
+
+=>Idle threads consume memory.
+If you keep creating new executors without shutting them down, it can lead to resource exhaustion.
+Blocked Resources
+File handles, sockets, or database connections used by tasks may not be released properly.
+
+You might see tasks not completing or hanging.
+In tests or short-lived apps, this can cause flaky behavior.
+
+=>invokeAll(Collection<? extends Callable<T>> tasks) Invokes collection of tasks and returns a list of future object.
+invokeAny(Collection) ->Executes a batch of tasks and returns the result of one that completes successfully first.
+
+=>awaitTermination(TimeOut, TimeUnits)-> just like join() blocks the main thread untill all the threads complete based on 
+a timeout.
+
+Difference between Callable and Runnable:
+
+1. Callable has a return type of generic type where as Runnable wont return anything.
+2. Callable throws checked exceptin, whereas runnable wont.
+3. Runnable used with Thread and Executorservce as well where callable is used with future and ExecutorService.
+
+🔐 What is a ReentrantLock?
+ReentrantLock is a class in the java.util.concurrent.locks package that provides a more flexible and powerful alternative to the synchronized keyword for controlling access to shared resources in multi-threaded environments.
+The term "reentrant" means that the same thread can acquire the lock multiple times without causing a deadlock. 
+
+
+Count Down Latch:
+===================
+Its a synchronisation aid that allows one or more thread to wait untill the operations being performed in the other threads complete.
+
+Make use of await() to block other threads, countDown() method decremenets by 1 post execution of a thread.
+When countDown() becomes zero. The blocked threads will execute.
+
+Cyclic Barrier:
+=================
+1. A synchronisation aid which allow the set of threads to wait for each other to reach a common barrier point.
+2. This is called cyclic barrier because it can be reused 	after the waiting threads are released.
+3. Await method block each thread untill last thread in a party arrives.
+
+Atomic Variables:
+==================
+1. Atomic variables are part of the java.util.concurrent.atomic package. They provide a way to perform thread-safe 
+operations on single variables without using synchronization (synchronized blocks or methods).
+2. They are called atomic because their operations are indivisible — they either complete fully or not at all, even 
+in the presence of multiple threads.
+
+
+COncurrent HashMap:
+====================
+
+COncuurent hashmap is the concurrent version of hashmap where multiple threads can work on it concurrently with out causing
+any data consistency or situations of race conditions.
+
+It wont accept the null keys and values due to ambiquity problem.
+
+Concurrent hashmap makes use of segment based locking instead of locking the entire hashmap and thus increasing the performance
+-> In concurrent hash map there will be concurrency level based on that concurrency level the nodes of hashmap will be
+segregated into segments and the other threads are blocked for writing. Other threads will aquire the lock on remaining segments
+with no lock and perform their operations.
+ These segments acts like mini hashmaps where each thread acquire the lock on this segment and perform
+the updates. For reading, multiple threads will have volatile reads without blocking each other.
+
+Hashmap implements the map interface. It accepts the entries in the form key value pair. It accepts one null key and multiple
+null values. 
+When you insert a key-value pair with a null key, like map.put(null, "value"), the HashMap does not compute a hash for the key (since null has no hashCode()).
+Instead, it always stores the null key in bucket index 0 of the internal array.
+
+Hashmap mak use of array of buckets internally, which can store multiple values in the same bucket using linked list.
+
+-> When you put the elements into the hshmap, java firstclaculates the hashcode of that particular and with taht hashcode,
+it will calculate the index of index of the bucket at which this key value pair should be stored.
+
+It also checks whether the key is already present in that bucket if it present it will store else it updates the value.
+
+While getting the values, we give the give and hashmap returns the values:
+Internally java calculates the hash index, then it will search through out the linked list or binary tree.
+it will check for the matches with the key, if its matched then it returns the value else it returns null.
+
+HAndling collison:
+If multiple keys have the same hash index, then this is called hash collison, 
+Java handles it storing the keys in the same bucket using linked list.
+
+Resizing: Loader factor is the param which decides when the hashmap to perform the resizing
+
+
+public class Singleton {
+    private Singleton() {}
+
+    private static class Holder {
+        private static final Singleton INSTANCE = new Singleton();
+    }
+
+    public static Singleton getInstance() {
+        return Holder.INSTANCE;
+    }
+}
+
+We can call this method from a particular thread when it wants to voluntarily give up its current execution time.
+In that way it’ll allow other threads of equal priority to run.
+It’ll just hint the Thread Scheduler that it is ready to give up CPU time but there is no guarantee that it’ll happen.
+When: A thread is performing a long-running task but doesn't need to monopolize the CPU usage.
+
+You cannot use synchronized with constructors, static initializers
+
