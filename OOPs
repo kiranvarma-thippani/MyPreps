@@ -1,0 +1,335 @@
+Java OOPs:
+
+What is a Class?
+In Java, a class is a blueprint or template for creating objects.It defines the properties (fields) and 
+behaviors (methods) that the objects created from the class will have.
+
+What is an object?
+Object is an real word entity whichi is created from the class. Every object consist of state, behaviour and idemtity(unique reference in memory)
+fields within an class from which the object is created decides the state of an object and methods decides the behavior.
+
+What are oops?
+
+Oops stands object oriented programing, The main pillars of the OOPs are 
+1. Abstraction.
+2. Encapsulation.
+3. Inheritance 
+4. polymorphism
+5. Aggregation.
+
+1. Abstraction:
+===============
+Abstraction is the process of hiding the unnecceary implementation details to the outside world or the user and only provides the 
+fucntionality. In other words, we can say that user will have the idea on what the object does rather than how it does.
+
+Car Example like starting the car.
+
+Abstraction can be done in 2 ways
+1. Abstract class 
+2. Abstract interface.
+
+Abstraction using the Abstract class:
+===================================
+If in a java class if we use the keyword abstract, then it is said to be an abstract class.
+
+1. Java abstract classes may or may not contain abstract methods, i.e., methods without body ( public void get(); )
+
+2. But, if a class has at least one abstract method, then the class must be declared abstract.
+
+3. If a class is declared abstract, it cannot be instantiated.
+
+4. To use an abstract class, you have to inherit it from another class, provide implementations to the abstract methods in it.
+
+5. If you inherit an abstract class, you have to provide implementations to all the abstract methods in it.
+
+Example:
+* File name : Employee.java */
+public abstract class Employee {
+   private String name;
+   private String address;
+   private int number;
+
+   public Employee(String name, String address, int number) {
+      System.out.println("Constructing an Employee");
+      this.name = name;
+      this.address = address;
+      this.number = number;
+   }
+   
+   public double computePay() {
+     System.out.println("Inside Employee computePay");
+     return 0.0;
+   }
+   
+   public void mailCheck() {
+      System.out.println("Mailing a check to " + this.name + " " + this.address);
+   }
+
+   public String toString() {
+      return name + " " + address + " " + number;
+   }
+
+   public String getName() {
+      return name;
+   }
+ 
+   public String getAddress() {
+      return address;
+   }
+   
+   public void setAddress(String newAddress) {
+      address = newAddress;
+   }
+ 
+   public int getNumber() {
+      return number;
+   }
+}
+
+You can observe that except abstract methods the Employee class is same as normal class in Java. The class is now abstract, 
+but it still has three fields, seven methods, and one constructor.
+
+As the class i abstract class we cant instantiatie the object of the abstract class.
+
+🔹 Why Have a Constructor in an Abstract Class?
+Even though you can't create an object of an abstract class directly, its constructor is called when a subclass is instantiated. Here's how it works:
+✅ Purpose of the Constructor:
+
+Initialize common fields: Abstract classes often have fields that are shared across all subclasses. The constructor helps initialize those.
+Set up internal logic: You might want to perform some setup that applies to all subclasses.
+Constructor chaining: When a subclass is created, Java first calls the constructor of the abstract superclass before executing the subclass constructor.
+
+So in order to create to create the objects of the abstract class, we need to inherit the abstract class with the subclass and give 
+implementation to the abstract methods. While creating the object of subclass the parent class is instantiated. Hence the constructor of abstract
+class is called and all the fields inside abstract get initialised and common logic which applies to all its subclasses can be writtern.
+
+WHy Abstract methods:
+
+1, If you want a method in your class. But you want its implementation to be done by its child class, we use abstract method,
+
+2. use abstract keyword before the methof name.
+
+3. use extends to inherit the abstract class methods.
+
+
+Tricky Question:
+
+1. Can an abstract class implement an interface without implementing all its methods?
+✅ Yes.
+🧠 But then the abstract class must remain abstract, and the responsibility to implement the remaining methods falls on the concrete subclass.
+
+2. Can an abstract class have static methods?
+✅ Yes.
+🧠 Static methods belong to the class, not the instance, so they can exist in abstract classes.
+
+3. What if a subclass overrides an abstract method and throws a broader exception?
+❌ Compilation error.
+🧠 The overridden method cannot throw broader or new checked exceptions than the abstract method.
+
+4. Can you use final with an abstract class?
+✅ Yes.
+🧠 You can declare final variables or final methods inside an abstract class, but the class itself cannot be final, because it must be extended.
+
+5. Can an abstract method be synchronized?
+❌ No.
+🧠 You cannot declare an abstract method as synchronized because it has no body to synchronize.
+
+6. Can an abstract class extend another abstract class?
+✅ Yes.
+🧠 It can inherit abstract methods and choose to implement some or leave them for its subclasses.
+
+7. Can an abstract class have a main() method?
+✅ Yes.
+🧠 You can run a main() method from an abstract class to test static logic or instantiate anonymous subclasses.
+
+ 8. Can an abstract class implement an interface without implementing its methods?
+✅ Yes, but the abstract class must remain abstract.
+🧠 The concrete subclass will be responsible for implementing the interface methods.
+
+What is 100% Abstraction?
+100% abstraction means:
+
+The class exposes only abstract methods (no implementation).
+It defines only behavior, not how it's done.
+The user of the class only knows what the class can do, not how it does it.
+
+This is typically achieved using interfaces in Java.
+
+1. You want to share code (implementation) among related classes
+
+Abstract classes can have concrete methods and fields.
+Useful for providing default behavior.
+
+Javaabstract class Animal {    void breathe() {        System.out.println("Breathing...");    }    abstract void makeSound();}Show more lines
+✅ 2. You want to define a base class with common state
+
+Abstract classes can have instance variables.
+Interfaces cannot (only constants).
+
+✅ 3. You expect future evolution of the base class
+
+You can add new methods without breaking subclasses.
+Interfaces require careful versioning (especially before Java 8).
+
+✅ 4. You need constructors
+
+Abstract classes can have constructors to initialize fields.
+Interfaces cannot have constructors.
+
+Interfaces in java:
+===================
+1. In Java, the methods in interfaces are abstract by default.
+2. impicitly public
+3, only static(no constructor, accessed using interface reference name)  and final(no constructor hence constant) variables 
+4. class implementing interfaces must implement all the methods in interface if not the implementing class must be declared as abstract.
+5. If the method is overriden, that method should not throw the broader exception than the parent class.
+6. One should not declare the declare the checked exception in the method sigature unless the abstract method do so.
+7. Interface can extend any number of interfaces and if there are any common abstract methods only one abstract among them will implemented
+8. Regarding the multiple inheritances
+i. Abstract methods with same signature: No conflict, implement once.
+ii. Default methods with same signature: Conflict must be resolved by overriding.
+
+
+Interfaces could only have abstract methods
+
+If you added a new method to an interface, all implementing classes had to implement it — even if they didn’t need it.
+This broke backward compatibility and made interface evolution difficult.
+
+With default methods, you can add new methods to interfaces with a default implementation.
+
+
+Advantages:
+1. This helps in designing clean, modular, and loosely (testability, use any implementation)coupled systems you can swap the implementations..
+2. Increases the testability.
+3. supports multiple inheritance.
+4. Functional programminvg
+
+Inheritance:
+1. Its one of the important pillars in java where one class inherities the propertis(methods, fields)of its parent class .
+Not only inheriting the fileds and methods we can also override them .
+2. Inheritance also plays a major role in the oops concepts like polymorphism and abstraction as well.
+3. Importanat point: The Superclass reference variable can hold the subclass object, but using that variable you can access only the members of the
+ superclass, so to access the members of both classes it is recommended to always create reference variable to the subclass.
+4. A copy is created within the subclass during inheritance in java
+5. Constructor is not inherited but is called using the super keyword. if the constructor in the parent class is default then the super() methods is called
+if its overlaoded then we should use suoer(params).
+6. The super keyword is similar to this keyword. Following are the scenarios where the super keyword is used.
+   It is used to differentiate the members of superclass from the members of subclass, if they have same names.
+   It is used to invoke the superclass constructor from subclass.
+7. We can inherit all the properties except the ones which are private ,final methods.\\
+
+
+is-a is a way of saying: This object is a type of that object. Example Explaination needed for this.
+to check this we use  the instanceof Keyword
+
+Upcasting is when you assign a child class object to a parent class reference.
+It’s called “upcasting” because you're going up the inheritance hierarchy.
+
+Polymorphism: You can treat different child objects uniformly using the parent reference.
+Flexibility: You can write generic code that works with any subclass.
+Safe: It’s always safe and implicit in Java.
+
+
+In inheritance, fields are resolved at compile time and methods are at run time.
+
+package Inheritancepractise;
+
+class Animal{
+	int legs;
+	boolean tail;
+	public Animal(int legs, boolean tail) {
+		super();
+		this.legs = legs;
+		this.tail = tail;
+	}
+	public void sound() {
+		System.out.println("animal making soud=nd");
+	}
+	public void run() {
+	System.out.println("Running hard");	
+	}
+	
+}
+class Dog extends Animal{
+	int age;
+	public Dog(int legs, boolean tail,int age) {
+		super(legs,tail);
+		this.age=age;
+		// TODO Auto-generated constructor stub
+	}
+	public void sound() {
+		System.out.println("dog is barking");
+	}
+	public void sleep()
+	{
+		System.out.println("dog is sleeping");
+	}
+}
+
+public class main {
+ public static void main(String[] args) {
+	Animal oobj=new Dog(2,true,4);
+	Dog d=(Dog)oobj;
+	d.sleep();
+   
+	 
+ }
+
+}
+
+Animal is parent, Dog is a child --> is a relation ship.
+
+Animal animal=new Dog()  --> If any method from Animal is overriden in the Dog class, Dog's method is called, else Animals method called.
+only animal class variables are accessible.
+To acess child variables or methods using down casting.
+
+In java, a class inherits only one class and implements multiple interfaces hence the hybrid inheritance is not allowed in java.
+
+1. Class A-> Class B
+2. Class A-> class B -> Class C
+3. Class B extends A and B - which is not possiblr
+4. Class B inherits class A and Class C inherits Class A.
+
+Inheritance in Java is an object-oriented programming feature that allows one class (called the child or subclass) to acquire the 
+properties and behaviors (fields and methods)of another class (called the parent or superclass). It promotes code reusability, method overriding, and supports polymorphism.
+
+Inheritance + Exception handling questions are important.
+
+
+Tricky Questions:
+===============
+
+3. What is the difference between method overriding and method hiding?
+Answer:
+
+Overriding applies to instance methods and is resolved at runtime.
+Hiding applies to static methods and is resolved at compile time based on the reference type.
+
+4. Can constructors be inherited in Java?
+Answer:
+No, constructors are not inherited. However, a child class can call the parent’s constructor using super().
+
+
+7. Can you override a private method in Java?
+Answer:
+No, private methods are not inherited, so they cannot be overridden. You can define a method with the same name
+ in the child class, but it’s not considered overriding.
+ 
+Encapsulation:
+==============
+Encapsulation is one of the core principles of object-oriented programming. It refers to the practice of bundling data (fields) and 
+methods that operate on that data into a single unit,typically a class. It also involves restricting direct access to some of the 
+object's components, which is usually done using access modifiers like private, protected, and public.
+
+1. Data Protection.Encapsulation hides the internal state of an object and protects it from unintended or unauthorized access. Only authorized methods (getters/setters) can access or modify the data.
+2. Better Control Over Data: Encapsulation allows you to add validation logic in setter methods to ensure that only valid data is stored in the object.
+Sensitive data can be hidden from external access, reducing the risk of accidental or malicious manipulation.
+3. By keeping data and behavior together in one class, encapsulation makes code easier to manage, debug, and update. 
+Changes to internal implementation don’t affect external code using the class.
+
+==========================================================================================================================
+Polymorphism means one thing behaving in different ways. In Java, it allows methods to do different things based on the object calling ]
+them — like the same method name working differently in different classes.
+
+method and reference callings.
+
