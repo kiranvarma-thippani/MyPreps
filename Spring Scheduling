@@ -1,0 +1,128 @@
+-> It allows you to automate the repetitive tasks at regular intervals or timings.
+-> @EnableSheduling on @springbootAPplication. basically on the top of application
+-> We should use @schedule on the top of the method where we want to automate the process. 
+
+Inside @schedule takes some params here() depending upon those param the task will be running at regular time intervals.
+
+@scheduled(fixed=10000) : So this will make to run the method on its own after every 10 seconds.
+
+But if the method itself runs for more than 10 seconds, then the job will again get submitted so this leads to the method overlaping.
+
+-> So in order to over  come this, we use fixedDelay so that the method executes again after a fixed delay post completion of the previous invocation.
+
+So in order to have a initial delay, we should use @scheduled(initialyDelay=10000, fixedDelay=50000);
+
+-> Cron Expressions:
+
+Using fixedDelay, fixed and initial delay, we just try to repeat the task or for every few seconds, or after a initial delay, we are invoking the process.
+
+But by using all these things, we only run the jobs at regular interfaces but if we want to run a specific job at a particular day, at a particulart
+time we can use cron expression.
+
+@scheduled(cron="* * * * * *") Here the six asterisks are used to define the expression.
+
+
+first * - represents seconds. 0-59
+
+Second * - this represents minutes 0-59
+
+third * - this represents hour 0-23
+
+fourth * - represents day in a month 1-31
+
+fifth * - reprsents month in a year 1-12
+
+sixth * - represents week 0-7 here sunday is -0 or 7.
+
+
+We can also have different types of symbols represents different type of config. 
+
+* (Asterisk)
+Matches all values in the field
+(e.g., * * * * * * runs every second)
+
+
+, (Comma)
+Specifies multiple values
+(e.g., 0,15,30,45 * * * * * runs at 0, 15, 30, and 45 seconds)
+
+
+- (Dash)
+Defines a range
+(e.g., 10-20 * * * * * runs from second 10 to 20)
+
+
+/ (Slash)
+Specifies increments
+(e.g., */5 * * * * * runs every 5 seconds)
+
+
+? (Question Mark)
+Used for day-of-month or day-of-week when you don’t care about the value
+
+
+L (Last)
+Represents the last day of the month or last day of the week
+
+
+W (Weekday)
+Runs on the nearest weekday to a given day
+(e.g., 15W means the nearest weekday to the 15th)
+
+
+# (Nth Day)
+Runs on the Nth occurrence of a weekday
+(e.g., 2#3 means the third Monday of the month)
+
+
+
+Dynamic Scheduling:
+==================
+
+Creating the cron job at run time. 
+
+We schedule the delay or the frequenceies at which the job should run,  before deploying the app and once it deployed we cant change the cron job settings
+
+So in order to get rid of that, we use dynamic scheduling of the cron job.
+
+One ways is we persists the values in DB and we update the cron values in the DB and use it in cron expression. Thus dynamic schedule take place.
+
+In order to work with dynamic task scheduling, we use scheduledTaskExecutor which is provided by the spring framework. We set the bean and intialise f the same.
+
+By Default it uses defaulthreadpooltaskexecutor, so if want multiple threads, we can make use of threadpooltaskexecutor . we create a bean in the config 
+class and then use it. In case of multithreating we make use of @Async. In case of .cancel() and .schedule we use threadpooltaskexecutor here.
+
+ConditionalOnProperty(name = "scheduler.enabled", havingValue = "true")
+
+🔧 Parameters of @ConditionalOnProperty:
+
+name: The name of the property to check.
+havingValue: The value that must match for the bean to be created.
+matchIfMissing: (Optional) If set to true, the bean will be created even if the property is missing.
+
+For cron job in our teleco domain. Runtime.getRuntime().exec("ssh user@openvms-host 'run cleanup_command'");
+ 
+
+ For the APIs I develop, I focus on unit testing and component-level testing to ensure the business logic, validations, and error handling are working correctly.
+We have a dedicated QA or integration team that handles end-to-end integration testing, including how our APIs interact 
+with other services or front-end systems.
+
+Interview about testing.
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
