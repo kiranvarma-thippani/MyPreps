@@ -229,4 +229,79 @@ String Regex:
 7. . -> matches dot.
 8. @ matches @symbol
 9. \w{2,} atleast 2 characters matches
-10. [^a-d 
+10. [^a-d ]
+
+
+Sunm of even numbers.
+====================
+package StreamApiQuestions;
+
+import java.util.List;
+
+public class EvenNumbers {
+	
+	public static void main(String[] args) {
+		
+		List<Integer> list=List.of(1,2,3,4,5,6,7,8,10,11,12,15,30,25,23,32);
+		
+		long j=list.stream().filter(i->i%2==0).reduce(0,(a,b)->a+b);
+		System.out.println(j);
+		
+		
+	}
+
+}
+
+Prime Numbers Logic:
+==================
+package StreamApiQuestions;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class PrimeNumbers {
+    public static void main(String[] args) {
+        List<Integer> numbers = Arrays.asList(2, 3, 4, 5, 10, 11, 15, 17, 20);
+
+        List<Integer> primes = numbers.stream()
+            .filter(PrimeNumbers::isPrime)
+            .collect(Collectors.toList());
+
+        System.out.println("Prime Numbers: " + primes);
+    }
+
+    private static boolean isPrime(int num) {
+        if (num <= 1) return false;
+       return IntStream.rangeClosed(2, (int)Math.sqrt(num)).allMatch(n->num%2!=0);
+    }
+}
+
+Check if every number in a list is positive.
+
+public class EvenNumbers {
+	
+	public static void main(String[] args) {
+		
+		List<Integer> list=List.of(1,2,3,4,5,6,7,8,10,11,12,15,30,25,23,32);
+		
+	   boolean b=list.stream().allMatch(i->i>0);
+	   System.out.println(b);
+		
+		
+	}
+
+}
+
+Identify the number that occurs the most frequently in a collection.
+
+	List<Integer> list=List.of(1,2,3,4,5,6,7,8,10,11,12,15,30,25,23,32,2,2,2,4,6,4,9,10,15,30);
+		
+	 int i=  list.stream().
+			   collect(Collectors.groupingBy(Function.identity(),Collectors.counting()))
+			   .entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
+		
+		
+
+
