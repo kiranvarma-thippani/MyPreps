@@ -1,0 +1,30 @@
+Profiles:
+=========
+1. Spring boot profiles enables us to use different types of configurations in the different environments with out refactoring
+the actual code.
+2. It can be done by define different types application.properties files for different environment for example:
+applcation-dev.properties.
+appliction-qa.propeties. We can switch to different configuration for the same code base at run time
+
+1. java -jar kiran.java --spring.profiles.active=dev,test,qa. here the dev,test,qa environmens are activated.
+2. The latest environment will overrides the previous environments application.properties.
+
+@Profile("dev") is used for the creation of the beans only in specific environment 
+
+Application.properties and Application.yml:
+------------------------------------------
+yml file supports the hierarchial structure.
+-> It provides cleaner and hierarchial structure.
+-> It groups all the related properties hireachially under one block and helpful to manage the yml files.
+-> For example spring. database,
+
+use --- to specify different yaml file within the existing yaml file.
+
+spring:
+  config:
+    activate:
+	  on-profile: dev
+server
+  port: 9001
+  
+==================================================================================
