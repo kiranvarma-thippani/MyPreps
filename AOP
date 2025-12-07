@@ -1,0 +1,65 @@
+AOP in spring boot:
+==================
+@EnableAspectJAutoProxy is internally present in @springboot Applications, so no need of writing it again.
+-> Annotate your aspect as @Aspect.
+-> Mark it with @Component annotation. so that the spring will auto detect and register in the spring container.
+
+-> Aspect: The class that encapsulates the cross cutting concerns are said to be the Aspect. In this Aspect we define
+the pointcuts and joinpoint().
+-> Advise: The Actions that are to be performed at a particular point in the application execution typically called a joinpoint
+is said to be advice.
+-> pointcut-> its an expression kind a thing by which we determine the join point where the advice should be applied.
+
+-> Advices are few types as below.
+
+-> The actions that your aspect takes at a particular join point is said to be the advice:
+1. @Before()-> This Advice is executed before the method execution starts.
+2. @After()-> This Advice is executed before the method execution ends.
+3. @Around()-> It is used to define the advice in the aspect class that runs before method invocation and after the invocation
+as well. It gives you the full controll in the method execution
+->You can execute the custom logic prior to the method invocation and after the method invocation as well.
+-> The method which is annotared with the @Around annotation must accept the proceeding joinpoint object.
+-> This proceeding joinpoint is used to invoke the actual method using proceed() method.
+-> Post completion of the execution if the method has any return type will return in the around advise method which we return
+to the client.
+4. @AfterThrowing("execution(* com.cg.service.saveUser(..))")-> Advice will execute after method completion throwing
+an exception.
+5. @AfterReturning()->Advice will execute after the method completes its execution normally.
+
+pointcut designators:
+1. "execution(* package.*(..)) -> any method within that package with any return type and number of params.
+2. "within(pakage.class)-> will intercept all the methods of the class and the aspect is applied.
+3. @PointCut("@within(org.stereotype.Service)")-> the class which is anotated with @servic, all of its methods get intercepted.
+4. @PointCut("@annotation(org.stereotype.Transactional)")-> The methods which are annotated with @Transactional will be intercepted
+and advice will be ran.
+5. @pointcut("target(targetobject))whatever the methods were called using the target object wll be intercepted.
+
+✅ JDK Dynamic Proxy
+
+What it is: Built into Java (java.lang.reflect.Proxy).
+How it works: Creates a proxy implementing interfaces and delegates calls to an InvocationHandler.
+Requirements: Target must implement at least one interface.
+Mechanism: Uses reflection to route method calls.
+Limitations:
+
+Cannot proxy classes directly.
+Only intercepts interface methods.
+
+
+Spring usage: Default choice if bean implements interfaces.
+
+
+✅ CGLIB Proxy
+
+What it is: Uses bytecode generation (via ASM) to create a subclass of the target class.
+How it works: Overrides methods in the subclass and intercepts calls via MethodInterceptor.
+Requirements: Works even if no interfaces exist.
+Limitations:
+
+Cannot proxy final classes or final methods.
+Slightly heavier than JDK proxy.
+
+
+Spring usage: Used when bean has no interfaces or when proxyTargetClass = true.
+
+==================================================================
