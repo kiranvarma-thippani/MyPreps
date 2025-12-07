@@ -48,8 +48,8 @@ public class Summations {
 	}
 }
 
-Stream Methods in java:
-
+Stream Methods in java: -> Ways to create streams.
+========================
 Stream.of(elements); --> Direct Stream creation using elements.
 Arrays.Stream(array); --> Stream using Array.
 List.stream(), set.stream()--> Streams from set and list.
@@ -74,7 +74,6 @@ Arrays.stream().
 list.stream();
 
 Intermediate methods:
-
 1. map(Function)
 2. filter(predicate)
 3. sorted()
@@ -102,7 +101,7 @@ map and flatmap:
 map is used to transform each element in a stream. It takes a function and applies it to every element, 
 returning a new stream with the transformed elements.
 
-latMap is used when each element might itself be a stream or collection, and you want to flatten those 
+flatMap is used when each element might itself be a stream or collection, and you want to flatten those 
 into a single stream.
 
 Use map:
@@ -279,7 +278,7 @@ public class PrimeNumbers {
 }
 
 Check if every number in a list is positive.
-
+-==========================================
 public class EvenNumbers {
 	
 	public static void main(String[] args) {
@@ -302,6 +301,5 @@ Identify the number that occurs the most frequently in a collection.
 			   collect(Collectors.groupingBy(Function.identity(),Collectors.counting()))
 			   .entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
 		
-		
-
+	
 
