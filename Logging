@@ -1,0 +1,91 @@
+Logging in spring boot:
+1. Logging is the process of recording the events that are happening within our application whether it might be success,
+failures, exceptions anything.
+2. This log can be very useful in debugging the production issues.
+3. By default spring boot provides logback framework to do the logging process.
+ 1. Fatal.
+ 2. Error
+ 3. Warn
+ 4. Info
+ 5. Debug
+ 6. Trace
+ 
+ -> We can not use Trace, debug are not seen. We need to enable this in order to enable trace and debug.
+ logging.level.{package}=trace
+ 
+We can customize the loggers format using the app.properties:
+1. logging.pattern.console=%d{yyyy-MM-dd, HH,mm,ss} [%thread] % -5level %logger{36} - %m%n.\
+2. logging.file.name=logs/log.txt
+3. logging.pattern.console=%d{yyyy-MM-dd, HH,mm,ss} [%thread] % -5level %logger{36} - %m%n.\ --> custom format in files.
+
+TRACE
+Most detailed level, used for very fine-grained information (e.g., method entry/exit).
+Useful for debugging deep issues.
+
+DEBUG
+Detailed information for developers during debugging.
+Not recommended in production unless troubleshooting.
+
+INFO
+General application flow messages (e.g., service started, user logged in).
+Indicates normal operation.
+
+WARN
+Something unexpected happened, but the application can still run.
+Example: Deprecated API usage.
+
+ERROR
+Serious issue that might prevent part of the application from working.
+Example: Database connection failure.
+
+✅ Why are they useful?
+
+Control verbosity: You can configure which level to log in different environments (e.g., DEBUG in dev, INFO in prod).
+Troubleshooting: Helps isolate problems without flooding logs.
+Performance: Avoids unnecessary logging overhead in production.
+Monitoring: WARN and ERROR can trigger alerts in monitoring systems.
+ 
+logging.level.root=debug -> logs everything from root mainly used in development not used in production.
+Logs can be stored in files, db
+
+Three Components in Log4j2 framework:
+1. Logger -> All the classes should create the logger object in order to participate in the logging activity.
+2. Appender -> Indicates that where the logs should be appended.(File, JDBC, console, smtp,ftp appenders)
+3. Layout-> Format in which the logs should be stored.(simple layout, HTML layout, XML Layout, paatern output as per programmer).
+
+In simple Maven Project,
+<Configuration status="INFO/>
+<Appenders>
+<Console name="Console_name" Target="SYTEM_OUT"/>
+<PatternType="">
+<Filen name="/filePath" Target="File"/>
+<PatternType=""?>
+</Appenders>
+<Logger>
+</Logger>
+
+Slf4j:
+------
+slf4j stands for simple logging facade for java which acts as a facade that means as a abstraction layer on your logging framework.
+
+The main use of this slf4j is that we can change the underlying logging framework at any time without disturbing the code:
+
+Basically we create loggers using Logger logger=LoggerFactory.getLogger(Class.class);
+
+logger.info("hi");
+logger.Debug("hhfhf");
+etc.
+
+=============================================================================================================
+Log4j2 is the succesive version of log4j. It provides many features like;
+1. Asynchronous logging, it makes use if lmax disruptor which work seamlessly in the application without blocking the threads.
+2. It is garbage free logging that means not that much temporary logger object created.
+3. It provides multiple appenders like files, console, database etc.
+4. Supports XML, JSON, YAML, and properties for configuration.
+5. Dynamic reloading of configuration without restarting the application.
+6. plugin Architecture: extensible using the plugins for custom filters, appenders.
+
+============================================================================================================
+
+
+ 
