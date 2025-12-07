@@ -134,3 +134,19 @@ headers,
 status codes,
 response body.
 new ResponseEntity(returntype, HttpStatus);
+
+@Value: Its is used to inject the values from application.properties in the bean at run time.
+
+@PathVariable
+=============
+Binds a part of the URL path to a method parameter.
+Represents resource identity.
+Example URL: /users/42 → 42 is captured from the path.
+
+Java@GetMapping("/users/{id}")public User getUser(@PathVariable Long id) {    return userService.getById(id);}Show more lines
+@RequestParam
+Binds query parameters (after ?) to method parameters.
+Represents filters, options, pagination, etc.
+Example URL: /users?role=ADMIN&page=2
+                                  
+
