@@ -42,8 +42,7 @@ No Spring needed.
 Your properties are logically organized.
 One bean for one feature.
 
-
-Supports nested properties
+Supports nested properties as well. 
 
 Great for microservices with complex config.
 
