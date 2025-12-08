@@ -1,0 +1,51 @@
+@value:
+---------
+We can inject the value of a field from application properties or application.yml files into your bean.
+
+By using this we can ensure dynamic configuration.
+
+@value("${application.something.something}").
+
+Drawbacks of @Value:
+-------------------
+1. No Type safety(Everything is String by default).
+2. Values scattered across the Application.
+3. No grouping of related settings. For nested or grouping it becomes messy and repetative.
+4. Refactoring becomes risky.
+5. harder to test.
+6. Harder to maintain the consistency across the Environments.
+
+
+@ConfigurationProperties:
+-------------------------
+@ConfigurationProperties in Spring Boot is a powerful annotation used for binding external configuration (from 
+application.properties or application.yml) to Java objects in a type-safe way.
+
+It allows you to map a group of related properties into a POJO (Plain Old Java Object).
+Instead of using multiple @Value annotations, you can bind all properties under a common prefix to a single class.
+
+Key Benefits
+
+
+1. Type safety
+“If the config type mismatches, Spring fails at startup — not at runtime.”
+
+
+2. Easier testing
+
+You can simply create an instance of the config class in unit tests.
+No Spring needed.
+
+
+3. Grouping related config
+
+Your properties are logically organized.
+One bean for one feature.
+
+
+Supports nested properties
+
+Great for microservices with complex config.
+
+
+https://github.com/codesnippetjava/ConfigPropertiesDemo --> code
