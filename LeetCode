@@ -1,0 +1,41 @@
+
+Maximum sum:
+class Solution {
+    public int maxSubArray(int[] nums) {
+       int maxSum=Integer.MIN_VALUE;
+       int sum=0;
+       int start=0;
+       int end=nums.length;
+       while(start<end){
+        sum=sum+nums[start];
+        maxSum=Math.max(maxSum,sum);
+        start++;
+        if(sum<0){
+            sum=0;
+        }
+       }
+return maxSum;
+    }
+}
+
+moving 0s to end of the array
+============================
+class Solution {
+    public int[] moveZeroes(int[] nums) {
+    int pos=0;
+    int[] arr=new int[nums.length];
+    for(int i=0;i<nums.length;i++){
+        if(nums[i]!=0){
+          nums[pos]=nums[i];
+          pos++;
+        }
+    }
+    while(pos<nums.length){
+        nums[pos]=0;
+        pos++;    
+    }
+    return arr;
+        }
+}
+
+
