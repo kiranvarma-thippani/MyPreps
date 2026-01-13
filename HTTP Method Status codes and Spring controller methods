@@ -1,0 +1,136 @@
+Important Annotations in SpringMVC or Boot:
+====================================
+@Controller:
+1. COntroller is a stereo type annotation which marks a controller as spring mvc controller that means the particular class
+is able to handle the http requests. 
+2. Typically used along with the http methods like getMapping, putMapping requestMapping to map the web requests to handler methods. 
+3. @controller methods usually wprk with the Logical view names and potentially data.
+4. In order to make the controller methods to return data like json or xml, we basically make use of @ResponseBody Annotation.
+
+@RestControllers: RestControllers are the spring annotations which are used to create restful APIs.
+It is essentially combination of two annotations namely responsebody and controller.
+
+@Response Body:
+We define @ResponseBody indicates that the return value of the method should be directly written to the HTTP respons body.
+Automatically serializes Java objects to JSON or XML using Jackson or other converters.
+No need to annotate each method with @ResponseBody—it’s implied.
+
+@RequestBody:
+is an annptation which is used to bind the http request data to the method parameter.
+-> We typically use this in post, put or patch requests through which we send the data to server.
+-> The @RequestBody tells spring to convert the input json or xml file to deserialize into the java objects.
+
+@RequestMapping tells Spring which controller method should handle which HTTP request.
+You can put it at the class level (to define a base path) and/or the method level (to define the specific endpoint).
+
+In modern Spring apps, we usually prefer @GetMapping, @PostMapping, @PutMapping, @DeleteMapping, @PatchMapping—they’re
+specialized versions of @RequestMapping(method=...). But @RequestMapping is still super useful for multiple methods, 
+content negotiation, and fine-grained routing.
+
+HTTP methods, also known as HTTP verbs, define the action a client wants to perform on a resource. Each method has specific properties regarding safety (whether it changes the server state) and idempotency (whether repeating the request has the same effect as a single call). 
+Here are the primary HTTP methods and their properties:
+1. GET 
+Used to retrieve data or a representation of a resource from the server. 
+Usage Example: Fetching a list of users (GET /users) or details for a specific user (GET /users/1).
+Safe: Yes. A GET request should never modify the server's state; it is a read-only operation.
+Idempotent: Yes. Calling GET /users/1 multiple times will always return the same user data without any side effects.
+Cacheable: Yes. Responses can be cached by browsers and proxies to improve performance. 
+
+
+2. POST 
+Used to submit data to a server to create a new resource or perform a specific action that causes a state change. The server typically assigns the new resource its URI. 
+Usage Example: Creating a new user account (POST /users with user details in the body).
+Safe: No. It changes the server's state (creates a new resource).
+Idempotent: No. Sending the same POST request multiple times will likely result in multiple, duplicate resources being created on the server.
+Cacheable: No (generally). Responses can only be cached if explicitly instructed with caching headers.
+
+ 
+3. PUT 
+Used to update or replace the entire target resource with the data provided in the request body. If the resource does not exist at the specified URI, the server may create it. 
+Usage Example: Updating a user's entire profile at a specific URL (PUT /users/1 with the complete, updated user object).
+Safe: No. It changes the server's state (updates or creates a resource).
+Idempotent: Yes. Performing the same PUT request multiple times ensures the resource ends up in the exact same final state as the single request. Subsequent calls won't create unintended side effects.
+Cacheable: No. 
+
+
+
+4. PATCH 
+Used to apply partial modifications to a resource. Unlike PUT, it only sends the data for the fields that need updating, not the entire resource representation. 
+Usage Example: Updating just a user's email address (PATCH /users/1 with only the email field in the body).
+Safe: No. It changes the server's state.
+Idempotent: No (generally). The outcome might depend on the resource's current state (e.g., a request to "increment a counter by one" would change the result with each call). It is possible to design idempotent PATCH requests, but it's not guaranteed by the method itself.
+Cacheable: No (generally).
+
+ 
+5. DELETE 
+Used to remove the specified resource from the server. 
+Usage Example: Deleting a specific blog post (DELETE /posts/123).
+Safe: No. It changes the server's state (removes a resource).
+Idempotent: Yes. The resource is gone after the first successful request. Subsequent identical requests will have the same effect (the resource remains gone), typically returning a 404 Not Found or 204 No Content status.
+Cacheable: No.
+
+HTTP statuscodes;
+✅ 2xx – Success
+
+200 OK:
+When you successfully fetch data (e.g., GET /users returns user list).
+201 Created:
+After creating a resource (e.g., POST /orders creates an order).
+204 No Content:
+When you delete something (DELETE /users/123) and don’t return a body.
+
+
+✅ 3xx – Redirection
+
+301 Moved Permanently:
+When a website changes domain (e.g., http://old.com → https://new.com).
+302 Found:
+Login redirects (e.g., after successful login, redirect to dashboard).
+304 Not Modified:
+Browser caching – server says “use your cached copy”.
+
+
+✅ 4xx – Client Errors
+
+400 Bad Request:
+Invalid JSON or missing required fields in API request.
+401 Unauthorized:
+No valid token provided for a protected API.
+
+403 Forbidden:
+Token is valid but user doesn’t have permission (e.g., normal user trying admin action).
+
+404 Not Found:
+Requesting /users/999 when user doesn’t exist.
+
+405 Method Not Allowed:
+Sending POST to an endpoint that only supports GET.
+
+
+409 Conflict:
+Two users try to update the same record at the same time.
+
+422 Unprocessable Entity:
+Validation fails (e.g., email format wrong).
+
+429 Too Many Requests:
+API rate limit exceeded (common in payment gateways).
+
+
+✅ 5xx – Server Errors
+
+500 Internal Server Error:
+NullPointerException or unhandled exception in backend.
+502 Bad Gateway:
+API Gateway cannot reach microservice (e.g., service crashed).
+503 Service Unavailable:
+Server down for maintenance or overloaded.
+504 Gateway Timeout:
+Microservice takes too long to respond (e.g., DB query stuck).
+
+Response Entity is a generic class which represents the completed Http Response includinh
+
+headers,
+status codes,
+response body.
+new ResponseEntity(returntype, HttpStatus);
