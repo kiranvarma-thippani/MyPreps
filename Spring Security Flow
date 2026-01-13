@@ -1,0 +1,122 @@
+1. User submits credentials
+
+The user sends a POST request to /login (for form login) or uses HTTP Basic/JWT.
+Credentials: username + password.
+
+
+2. Request hits Spring Security Filter Chain
+
+Spring Security registers a DelegatingFilterProxy in the servlet container.
+This delegates to SpringSecurityFilterChain, which contains multiple filters:
+
+UsernamePasswordAuthenticationFilter (for form login)
+BasicAuthenticationFilter (for HTTP Basic)
+CsrfFilter, etc.
+
+
+
+
+3. UsernamePasswordAuthenticationFilter triggers
+
+Extracts username and password from the request.
+Creates an Authentication object (specifically UsernamePasswordAuthenticationToken) with these credentials (not yet authenticated).
+
+
+4. AuthenticationManager kicks in
+
+The filter calls AuthenticationManager.authenticate(authentication).
+By default, Spring uses ProviderManager with one or more AuthenticationProviders.
+For username/password, the default provider is DaoAuthenticationProvider.
+
+
+5. DaoAuthenticationProvider logic
+
+Calls your configured UserDetailsService.loadUserByUsername(username).
+
+If you didn’t configure one, Spring uses InMemoryUserDetailsManager by default.
+
+
+UserDetailsService returns a UserDetails object with:
+
+Encoded password
+Roles/authorities
+Account status flags
+
+
+
+
+6. Password verification
+
+DaoAuthenticationProvider uses the configured PasswordEncoder (e.g., BCryptPasswordEncoder) to compare:
+
+Raw password from the request
+Encoded password from UserDetails
+
+
+
+
+7. Authentication success
+
+If passwords match and account is valid:
+
+Creates a fully authenticated Authentication object.
+Stores it in SecurityContextHolder.
+
+
+If failure:
+
+Throws BadCredentialsException or UsernameNotFoundException.
+
+
+
+
+8. SecurityContext persistence
+
+SecurityContextPersistenceFilter saves the SecurityContext in the HTTP session (for stateful apps).
+For stateless APIs (JWT), you skip sessions and rely on tokens.
+
+
+9. Response
+
+If successful:
+
+Redirects to the default page or the requested resource.
+
+
+If failure:
+
+Redirects to /login?error or returns 401 Unauthorized for APIs.
+
+
+JWT Authentication in your PC
+
+===============================================================
+
+Auntentication in microservices architecture:
+---------------------------------------------
+In Microservices architecture, each service is an individual spring boot application. In order to secure the APIs we should implement
+the security code for each service. This is a combersome process. In order to separate the cross cutting concerns from the Business logic
+we keep all the security code in API gate way which acts as the single entry point for all your microservices within your application.
+it would be a great idea to implement the security code in the API Gateway. but gateway is solely designed for routing the incoming requests
+and balancing the incoming load evenly to the horizontally scaled services.
+
+So what we do is we create an auth service which can be used to register the user to the system if the user wants to login etc, we allow those requests 
+permit all those requests without any authentication. So if a user hits the authentication APIs like auth/register, auth/login will be 
+routed to the authentication-service without any token validation or authentication. So once the user tries to login, he will get a token
+from the auth service. For the subsequent http request, the token is validated at the API gateway. If the validation is successful, then the
+request is routed to the appropriate microservice else the user is prevented from using the system.
+
+We make use of custom filter which extends abstractgatewayfilterfactory and overrides the apply method whose return type is gateway filter.
+we will encapsulate the validation logic in this method.
+
+-> We also have routevalidator class which specifies what requests should be intercepted and validated and what are to be bypassed.
+-> The requests which tries to consume the secured apis are intercepted and validated by extracting the header and extracting claims,
+validating the username of the incoming requests and the one in the db and if ok then these requests are passed to the appropriate service
+we make use of filter in the application.yml file in the route location section so that every incoming requests to the service should
+get validated in the filter first and then passed to the microservice. 
+
+Refer to Java techie for code:
+
+https://github.com/Java-Techie-jt/jwt-apigateway-security/blob/main/swiggy-gateway/src/main/java/com/javatechie/filter/RouteValidator.java
+
+
