@@ -1,0 +1,225 @@
+Filters:
+=======
+Http Headers:
+1. For session tracking,
+2. For passing the meta data for a request
+3. Security passing a bearer tocken.
+4. Used for content negotiation which makes uses of key accept or content-type which tell the client is accepts the xml or json
+ format and content-type tells that what format its sending
+5. used for debugging carrys the x-correlation-Id
+6.API versioning
+7. Rate Limiting.
+
+===========================================================================================================
+Filter is component that sits between servlet API and the dispatcher servlet which is used to intercept the request from client
+and response from controllers and modify the requests and response. These filters are mainly used for applying the cross
+cutting concerns like security, logging etc to the incoming http requests.
+
+Filter chain is the group of filters chained so that our http request will be going through all of the filter logics and
+then passed to the dispatcher servlet.
+
+We can implement custom filter by implementing the Filter interface and its doFilter method which accepts ServletRequest, ServletResponse
+and Filter chain.
+
+doFilter(ServletRequest servletRequest, ServletResponse response, FilterChain chain){
+HttpServletRequest request=(HttpServlet)servletRequest;
+request.getRemoteAdress();
+}
+
+servletRequest.doFilter(servletRequest, servletResponse);
+
+Use cases of Filter in real time:
+1. Validating the JWT token.
+2. Performing the logging.
+3. Tracking the client based on the IP. Logging the headers and 
+4. Modifying the HTTP headers(Injecting correlation-Id)
+5. Rate Limiting: Limiting the exxesive traffic from a specific client with the IP
+6. Request Validation like validating content-type, request size.
+
+===========================================================================================
+Interceptors:
+-------------
+1. Interceptors are the components that functions within the spring mvc that means they sit in between controller and DS.
+2. They are being used for the implementing the cross cutting concern which needs the handlers.
+3. These Interceptors mainly consists of three methods preHandle, postHandle and AfterCompletion.
+4. These are used for reading and setting the headers and they have the limit access to modify the httprequest or response body
+as they work with HttpServletRequest and HttpServletResponse after the requestBody is being consumed by the message converters
+5. These are used to block the method call based on the authorization.
+
+1.Authentication & Authorization
+Check if the user is logged in or has required roles before hitting the controller.
+
+2. Logging & Monitoring
+Log request URI, handler method, execution time.
+Useful for performance profiling.
+
+
+5. Request Validation
+Validate query params or headers before processing.
+
+6. Rate Limiting
+Block requests if too many come from the same user/IP.
+
+
+============================================================================================================================================
+
+
+Filters and Interceptors in Spring Boot both handle cross-cutting concerns, but they operate at different levels of the request processing lifecycle.
+Filters:
+Level of Operation: Filters operate at the servlet container level, before the request reaches the Spring MVC DispatcherServlet. They are part of the Servlet API.
+Scope: They apply to all incoming HTTP requests, including static resources, and can modify the request and response directly (e.g., adding headers, changing encoding, security checks).
+Configuration: Implemented by extending the javax.servlet.Filter interface and often registered using FilterRegistrationBean in Spring Boot.
+Use Cases: Global concerns like logging, authentication, input validation, security, and modifying request/response content.
+
+
+Interceptors:
+Level of Operation: Interceptors operate at the Spring MVC level, within the Spring application context, after the DispatcherServlet has received the request but before it reaches the controller.
+Scope: They are specific to web requests handled by Spring MVC and are concerned with requests mapped to controllers, not static files. They can access the Spring context and manipulate the ModelAndView or prevent controller execution.
+Configuration: Implemented by extending HandlerInterceptorAdapter or implementing HandlerInterceptor and registered through the InterceptorRegistry in a WebMvcConfigurer implementation.
+Use Cases: More granular pre-processing and post-processing tasks related to controller execution, such as logging controller method execution times, authorization checks before specific controller methods, or modifying the model before rendering a view.
+
+=================================================================================================================================================
+
+1. User submits credentials
+
+The user sends a POST request to /login (for form login) or uses HTTP Basic/JWT.
+Credentials: username + password.
+
+
+2. Request hits Spring Security Filter Chain
+
+Spring Security registers a DelegatingFilterProxy in the servlet container.
+This delegates to SpringSecurityFilterChain, which contains multiple filters:
+
+UsernamePasswordAuthenticationFilter (for form login)
+BasicAuthenticationFilter (for HTTP Basic)
+CsrfFilter, etc.
+
+
+
+
+3. UsernamePasswordAuthenticationFilter triggers
+
+Extracts username and password from the request.
+Creates an Authentication object (specifically UsernamePasswordAuthenticationToken) with these credentials (not yet authenticated).
+
+
+4. AuthenticationManager kicks in
+
+The filter calls AuthenticationManager.authenticate(authentication).
+By default, Spring uses ProviderManager with one or more AuthenticationProviders.
+For username/password, the default provider is DaoAuthenticationProvider.
+
+
+5. DaoAuthenticationProvider logic
+
+Calls your configured UserDetailsService.loadUserByUsername(username).
+
+If you didn’t configure one, Spring uses InMemoryUserDetailsManager by default.
+
+
+UserDetailsService returns a UserDetails object with:
+
+Encoded password
+Roles/authorities
+Account status flags
+
+
+
+
+6. Password verification
+
+DaoAuthenticationProvider uses the configured PasswordEncoder (e.g., BCryptPasswordEncoder) to compare:
+
+Raw password from the request
+Encoded password from UserDetails
+
+
+
+
+7. Authentication success
+
+If passwords match and account is valid:
+
+Creates a fully authenticated Authentication object.
+Stores it in SecurityContextHolder.
+
+
+If failure:
+
+Throws BadCredentialsException or UsernameNotFoundException.
+
+
+
+
+8. SecurityContext persistence
+
+SecurityContextPersistenceFilter saves the SecurityContext in the HTTP session (for stateful apps).
+For stateless APIs (JWT), you skip sessions and rely on tokens.
+
+
+9. Response
+
+If successful:
+
+Redirects to the default page or the requested resource.
+
+
+If failure:
+
+Redirects to /login?error or returns 401 Unauthorized for APIs.
+
+
+JWT Authentication in your PC
+
+===============================================================
+
+Auntentication in microservices architecture:
+---------------------------------------------
+In Microservices architecture, each service is an individual spring boot application. In order to secure the APIs we should implement
+the security code for each service. This is a combersome process. In order to separate the cross cutting concerns from the Business logic
+we keep all the security code in API gate way which acts as the single entry point for all your microservices within your application.
+it would be a great idea to implement the security code in the API Gateway. but gateway is solely designed for routing the incoming requests
+and balancing the incoming load evenly to the horizontally scaled services.
+
+So what we do is we create an auth service which can be used to register the user to the system if the user wants to login etc, we allow those requests 
+permit all those requests without any authentication. So if a user hits the authentication APIs like auth/register, auth/login will be 
+routed to the authentication-service without any token validation or authentication. So once the user tries to login, he will get a token
+from the auth service. For the subsequent http request, the token is validated at the API gateway. If the validation is successful, then the
+request is routed to the appropriate microservice else the user is prevented from using the system.
+
+We make use of custom filter which extends abstractgatewayfilterfactory and overrides the apply method whose return type is gateway filter.
+we will encapsulate the validation logic in this method.
+
+-> We also have routevalidator class which specifies what requests should be intercepted and validated and what are to be bypassed.
+-> The requests which tries to consume the secured apis are intercepted and validated by extracting the header and extracting claims,
+validating the username of the incoming requests and the one in the db and if ok then these requests are passed to the appropriate service
+we make use of filter in the application.yml file in the route location section so that every incoming requests to the service should
+get validated in the filter first and then passed to the microservice. 
+
+Refer to Java techie for code:
+
+https://github.com/Java-Techie-jt/jwt-apigateway-security/blob/main/swiggy-gateway/src/main/java/com/javatechie/filter/RouteValidator.java
+
+
+=============================================
+
+Authorization:
+==============
+Authentication will check for who you are whether you are a the user of the system or not.
+Authorization is the process which tells what and all the authorities that a authenticated user has.
+
+Each user will having a role attached to it. Each role has different persmissions like read write and access to some functionalities.
+
+ROLE_ADMIN - Read write delete all the permissions.
+ROLE_USER  - Limited Access to the methods.
+
+
+1. We do have roles and each role will be having some permissions. SO that an authenticated user can only do the operations that they are having privilege to.
+
+2. Basically in our project, we used rolebased authorization.
+3. We made use of method security annotatitons such as @PreAuthorize, @PostAuthorize and @PreFilter and @PostFilter. 
+4. We persists the roles in the data base while registering the user.
+
+
+
