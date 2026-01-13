@@ -1,0 +1,15 @@
+1. git init  -> making the curent directory as the working directory
+2. git add . -> adding all the files in the staging area,
+4. git commit -m "message"-> commts done
+5, git status -> any files are in workng dir, staging area.
+6. when we modify the code, it again goes to untracked area.
+7. git restore --staged names.txt -> moves the file to normal area.
+8. git log -> list all the commits.
+9. git stash pop -> come out.
+10. git stash clear -> to clear the chqanges in the stash area.
+11. git remote add 	origin <link-of-your-git repository>.git
+12. git remote -v ==> this lists all the origins attached to your working directory.
+13. git push origin master => code is pushed to the master branch.
+14. git branch branch_name
+15. git checkout branch_name --> switched to the branch_name.
+16. git fetch --all prune -> fetches all the brances along with deleted comits
