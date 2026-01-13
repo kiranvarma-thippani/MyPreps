@@ -1,0 +1,218 @@
+ What is Struts?
+
+Struts is an older Java web framework based on the MVC pattern.
+It uses Action classes and JSP for views.
+Configuration is mostly XML-based.
+Focused on servlet-based architecture.
+
+
+✅ What is Spring (Spring MVC)?
+
+Spring MVC is part of the Spring Framework.
+Also based on MVC, but:
+
+Uses annotations (@Controller, @RequestMapping) instead of heavy XML.
+Provides dependency injection, AOP, and integration with other Spring modules.
+Easier to integrate with REST APIs and modern tools.
+
+IOC:
+
+DI:
+
+IOC Containers:
+---------------
+IOC containers are the responsible for creating beans and managing the life cycle of the beans. They are also
+responsible for dependencies injection in the spring beans. they also manage the configuration of the data.
+
+Two types of IOC Container:
+1. BeanFactory.
+2. Application Context.
+
+1. BeanFactory:
+-> Basic IOC. 
+-> Lazy Loading. Beans are created and managed in IOC when requested.
+-> When memory is the constarin use bean factory.
+-> Simple and light weight only supports basic IOC container features, No support of AOP, No Internalisation, Event Handling etc/
+
+2. Appliation COntext:
+-> This is widely used now a days. it is feature rich IOC.
+-> It creates all the beans while start up. 
+-> It supports internalization.
+-> Event Handling.
+-> Supports the AOP, Resource loadimg from filepaths, class paths etc.
+-> Automatic wiring Is fully Supported.
+-> Provides multiple Implememation ways:
+1. classpathxmlapplicationcontext.
+2. AnnotationConfigApplicationCOntext.
+ 
+XML way: 
+In src/main/resources folder define .xml file. Then define the .xml file:
+
+ <bean id="id" class="package.classname>
+   </bean>
+   
+ApplicationContext is the central interface to the Spring IoC container.  When the ApplicationContext is instantiated, it 
+automatically reads the XML configuration file, creates the container, and instantiates all the beans defined in it. Every 
+time a bean is created, the Spring container calls the constructor of the corresponding class, initializing the object.  
+
+ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");  
+Alien alien=(Alien)context.getBean("id");
+alien.run()
+
+
+Scopes of Bean in Spring:
+=========================
+In Spring, the scope of a bean defines the lifecycle and visibility of that bean within the Spring container. It determines 
+how many instances of the bean are created and how they are shared across the application. 
+
+1. @scope("singleton")
+-> It creates a single instance of bean. No matter what how many beans are there it only gives you the same bean.
+2. @scope("prototype")
+-> It creates a new object of bean every time you request for the bean.
+3. @scope("request")
+->  A new bean instance is created for each HTTP request.
+4. @session("session")
+-> One bean instance per HTTP session.
+
+1. The singleton bean is created at the application startup.
+2. If a bean whose scope is singleton has a dependncy whose scope is prototype or other it lazily loads. But it forces
+to load eagerly. 
+->if it is request, for each request it generates a new instance of the object.
+-> if it prototype, each time we access it creates a new instance of the bean.
+-> if you have any singleton scoped bean and trying to access the request scoped bean, as there is no active request it wont
+create a bean and throws an exception. At this point of time try to create a proxy and invoke it.
+@scope("request", proxyMode=scopedProxyMode.Target_class).
+-> same applies to the session scope bean injecting into singleton bean.
+
+->This is a classic scope mismatch problem in Spring:
+
+Session-scoped bean lives for the entire HTTP session.
+Prototype-scoped dependency should ideally be a fresh instance every time you use it.
+
+If you inject a prototype bean directly into a session bean, Spring will create one prototype instance at injection time and reuse it (not what you want).
+use @lookup.
+
+==============================================================
+when there are multiple beans of same type, spring will face ambiguity while dependancy injection
+and throw an exception nouniquebeandefinitionException.
+
+Autowiring in spring :
+Autowiring in Spring Boot is a feature of the Spring Framework that automatically injects dependencies into your beans without requiring 
+explicit configuration.
+It uses Dependency Injection (DI) to wire beans together based on type, name, or qualifiers.
+When you annotate a field, constructor, or setter with @Autowired, Spring looks for a matching bean in the application 
+context and injects it.
+The matching is usually done by type (class or interface), but you can refine it using @Qualifier if multiple beans of 
+the same type exist.
+ 
+Constructor Injection is a form of Dependency Injection where an object’s dependencies are provided at the time of its 
+creation through its Constructor.
+In Constructor Injection, dependencies are passed as parameters to the class’s constructor, making them explicit and 
+mandatory for creating the instance. This approach ensures that all essential dependencies are provided when creating 
+an object; if a dependency is not supplied, the object cannot be instantiated, clarifying the requirements for the class to 
+function properly.
+most prefered. Makes the object immuatable once it is created.
+
+In setter injection, we make use of theb setter methods to inject the dependancies. This setter injection is helpful in case of
+of injecting the dependancies post object creation. It is useful in injecting the optional dependancies. We can have more fine
+grain control on the dependancey injection that when we should inject the depenadnacy into the bean. we can add validation
+checks as well prior to the dependancy injection.
+
+more verbose, but ok.
+
+In field injection, the dependancies are injected into the field of a class directly. we mark the field as autowired on top
+of the field of a specific type. The spring will  match the type of field in the spring context and inject the matched bean
+into field of your bean. 
+hard to test as the field will be marked as private.
+
+======================================================================================================
+
+What happens when an application start().
+
+->Main Method Execution and SpringApplication.run(): The process begins with the execution of the main method in the entry point class, typically annotated with @SpringBootApplication. This method internally invokes SpringApplication.run(), which is the core of the Spring Boot bootstrapping process.
+->Environment Setup and Banner Display: The run() method prepares the application environment, considering profiles (e.g., dev, prod) and configuration files like application.properties or application.yml. It also displays the application banner.
+->Application Context Creation and Refresh: Spring Boot identifies the application type (e.g., web application if spring-boot-starter-web is present) and creates the ApplicationContext object, which serves as the Spring IoC container. This context is then refreshed, triggering various initialization phases.
+->Component Scanning and Bean Instantiation: Spring Boot automatically scans the classpath for components annotated with @Component, @Service, @Repository, @Controller, etc., and registers them as beans within the ApplicationContext. It then instantiates and wires these beans, resolving dependencies through dependency injection.
+->Auto-Configuration: A key feature of Spring Boot, auto-configuration dynamically configures the application based on the dependencies present in the classpath. For instance, if spring-boot-starter-web is included, Spring Boot automatically configures an embedded web server (like Tomcat) and sets up request handling. Similarly, adding spring-boot-starter-data-jpa triggers the configuration of database connections and JPA repositories. 
+Embedded Server Startup (for web applications): If it's a web application, Spring Boot starts an embedded servlet container (e.g., Tomcat, Jetty, Undertow) and registers the DispatcherServlet to handle incoming HTTP requests.
+Application Runners Execution: Optional CommandLineRunner and ApplicationRunner beans, if defined, are executed at this stage, allowing for custom logic to be performed right after the application context is fully initialized.
+Application Ready: Once all these steps are complete, the application is considered "ready" and is capable of handling requests or performing its intended tasks. Spring Boot publishes ApplicationReadyEvent at this point, which can be listened to for post-startup operations.
+
+======================================================================================================================
+Servlet container:
+-> Its a run time environment for servlets which manages the life cycles of the servlets and handles the http requests.
+-> init(), service(), destroy()
+✅ 1. init(ServletConfig config)
+
+Purpose: Called once when the servlet is first loaded into memory.
+Role: Used for initialization tasks (e.g., reading configuration parameters).
+When: Before handling any requests.
+
+
+✅ 2. service(ServletRequest req, ServletResponse res)
+
+Purpose: Handles each client request.
+Role: Dispatches requests to appropriate methods like doGet(), doPost(), etc., in HttpServlet.
+When: Called every time a request comes in.
+
+
+✅ 3. destroy()
+
+Purpose: Called once when the servlet is being removed from service.
+Role: Cleanup tasks (e.g., closing resources, releasing memory).
+When: Before the servlet instance is garbage collected.
+
+
+✅ 4. getServletConfig()
+
+Purpose: Returns the ServletConfig object.
+Role: Provides access to initialization parameters and servlet context.
+
+
+✅ 5. getServletInfo()
+
+Purpose: Returns a string with servlet information (like author, version).
+Role: Mostly for informational purposes.
+
+
+✅ Additional Methods in HttpServlet
+
+doGet(HttpServletRequest req, HttpServletResponse res)
+doPost(HttpServletRequest req, HttpServletResponse res)
+doPut(), doDelete(), etc.
+These are not part of the core lifecycle, but they are invoked by service() based on HTTP method.
+
+========================================================================================================
+
+Tomcat tomcat=new Tomcat();
+Context ctx=new Context("",null);//context is the webapplication running in the tomcat., docbase is the path to that webapp
+Tomcat.addServlet(ctx, "helloServlet", new HelloServlet());
+ctx.addServletMappingDecode("/hello","helloservlet");
+tomcat.start();
+tomcat.getServer().await
+
+
+1.Servlet creation by defining a class extending the httpservlet, use service method to handle the incming requests.
+2. create a maven project and in which add the embeded tomcat dependancy and java Servlet API in it.
+3. Create a class in the method create a Tomcat Object.
+Add servlet to that tomcat servlet container.
+Configure the context.
+4. map the servlet to the context using addServletMappingDecode method("path", name of servlet)
+=====================================================================================================================
+Spring mvc is a design pattern which is used to separate the concerns.
+ 1.model
+ 2. controller
+ 3. view.
+ 
+ Model:
+ 1. Represents data and business logic usually interacts with the data bases.
+
+
+
+
+User sends a request (e.g., /customers).
+Controller receives the request and decides what to do.
+Controller calls the Model to get or update data.
+Model returns data to the Controller.
+Controller passes data to the View.
+View renders the response to the use
