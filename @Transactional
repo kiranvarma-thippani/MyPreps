@@ -1,0 +1,323 @@
+Spring data jpa will provides @Transactional Annotation in which, it makes use of AOP for performing the operations in 
+transactional context.
+
+We make use of @Transactional on method or class level.
+-> @Transactional(rollBackFor/noRollBackfor=exception.class, Isoltation=IsolationType., Propogation, readOnly=true)
+-> class level is overiden by method level transactions.
+-> private methods and self invocations will not be performed in the transactionalContext.
+-> Use it on service level rather than repositories
+-> readOnly for queries to optimize performance and over ride in the custom methods,
+-> if you try to fetch the entities associated with lazily loaded entities, then if you try to access them outside the
+   transaction context it throws lazilyiniltialisationException.
+   
+Internal Working of transaction:
+=================================
+@Transactional in Spring is a powerful annotation that manages database transactions automatically. Here’s how it works 
+under the hood:
+
+✅ 1. What It Does
+
+Wraps your method execution in a transaction boundary.
+Ensures ACID properties (Atomicity, Consistency, Isolation, Durability).
+Handles commit or rollback based on success or exceptions.
+
+
+✅ 2. How It Works Internally
+
+When Spring sees @Transactional on a method or class:
+
+Bean Post-Processor detects it and creates a proxy (similar to AOP).
+The proxy intercepts method calls and delegates to a TransactionInterceptor.
+The interceptor:
+
+Starts a transaction before the method executes.
+Executes the method.
+Commits if successful, or rolls back if an exception occurs (based on rollback rules).
+
+✅ 3. Transaction Manager
+
+Spring uses a PlatformTransactionManager (e.g., DataSourceTransactionManager for JDBC, JpaTransactionManager for JPA).
+This manager interacts with the underlying database connection.
+
+
+✅ 4. Important Details
+
+Propagation: Defines,/u how transactions behave when calling another transactional method (e.g., REQUIRED, REQUIRES_NEW).
+Isolation: Controls how concurrent transactions interact (e.g., READ_COMMITTED, SERIALIZABLE).
+Rollback Rules: By default, rolls back on unchecked exceptions (RuntimeException), not on checked exceptions unless configured.
+
+
+✅ 5. Self-Invocation Issue
+
+If you call a @Transactional method from another method in the same class, the proxy is bypassed → transaction won’t start.
+Solution: Use separate beans or AspectJ mode.   
+======================================================================================================================
+
+TransactionManager:
+===================
+1.Transaction Manager Automatically initiates the transaction, runs the transaction and comits it.
+There are different types of transaction Manager supported by Spring:
+1. DataSourceTransactionManager-> JDBC
+2. HibernateTransactionManager.
+3. JPA Transaction Manager
+4. JTA Transaction Manager.
+
+Spring boot chooses the transactionManager on its own, when we give the @transactional annotaion.
+if we want to make use of our own transactionmanager i mean if we want to choose it, then we can override it in the 
+class annotated with @configuration class.
+
+Example:
+=======
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+
+import javax.sql.DataSource;
+
+@Configuration
+@EnableTransactionManagement
+public class TransactionConfig {
+
+    @Bean
+    @Primary
+    public PlatformTransactionManager transactionManager(DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
+    }
+} 
+========================================================================================
+
+Transaction Propogation:
+-----------------------
+Transaction propogation referes to how transaction behaves when a method annotated with @transactional called by a method
+that may or may not have a active transaction.
+
+✅ Propagation Types in Spring
+Spring provides several propagation options via Propagation enum:
+
+
+REQUIRED (default)
+
+If a transaction exists, join it.
+If none exists, create a new one.
+Most commonly used.
+
+
+
+REQUIRES_NEW
+
+Always start a new transaction.
+Suspends the existing transaction if present.
+Useful when you want isolation from the caller’s transaction.
+
+
+
+SUPPORTS
+
+If a transaction exists, join it.
+If none exists, run without a transaction.
+Good for read-only operations.
+
+MANDATORY
+
+Must run inside an existing transaction.
+Throws TransactionRequiredException if none exists.
+
+NOT_SUPPORTED
+
+Never run inside a transaction.
+Suspends any existing transaction.
+
+NEVER
+
+Must run without a transaction.
+Throws an exception if a transaction exists.
+
+NESTED
+
+Creates a nested transaction within the existing one using savepoints.
+Rollback of nested transaction doesn’t affect the outer transaction.
+Works only with JDBC and DataSourceTransactionManager.
+
+By default it required.
+When to use Required.
+
+
+WorkFlow:
+1. REQUIRED (Default)
+
+Behavior: If a transaction exists, join it; if not, create a new one.
+Workflow:
+
+Caller has transaction → Callee joins same transaction.
+Caller has no transaction → Callee starts a new transaction.
+
+
+Use Case: Most common scenario.
+
+
+2. REQUIRES_NEW
+
+Behavior: Always start a new transaction, suspending any existing one.
+Workflow:
+
+Caller has transaction → Suspend it → Start new transaction for callee → Commit/Rollback → Resume caller’s transaction.
+
+
+Use Case: Independent work that should not affect caller’s transaction.
+
+
+3. SUPPORTS
+
+Behavior: If a transaction exists, join it; if not, execute non-transactionally.
+Workflow:
+
+Caller has transaction → Callee joins.
+Caller has no transaction → Callee runs without transaction.
+
+
+Use Case: Read-only operations.
+
+
+4. MANDATORY
+
+Behavior: Must run inside an existing transaction; throws exception if none exists.
+Workflow:
+
+Caller has transaction → Callee joins.
+Caller has no transaction → Exception thrown.
+
+
+Use Case: Enforce transactional context.
+
+
+5. NOT_SUPPORTED
+
+Behavior: Always run non-transactionally; suspends any existing transaction.
+Workflow:
+
+Caller has transaction → Suspend → Callee runs without transaction → Resume caller’s transaction.
+
+
+Use Case: Operations that must not run in a transaction (e.g., long-running tasks).
+
+
+6. NEVER
+
+Behavior: Must run without a transaction; throws exception if one exists.
+Workflow:
+
+Caller has transaction → Exception thrown.
+Caller has no transaction → Callee runs normally.
+
+
+Use Case: Explicitly forbid transactions.
+
+
+7. NESTED
+
+Behavior: If a transaction exists, create a nested transaction (savepoint); else, create a new one.
+Workflow:
+
+Caller has transaction → Callee creates savepoint → Rollback only nested part if needed.
+Caller has no transaction → Callee starts new transaction.
+
+
+Use Case: Partial rollback within a larger transaction.
+===========================================================================================
+ 
+-> Isolation:Transactions run independantly and should not interfere with each other.
+-> Intermediate states of a transaction are not visible to other transactions
+
+Isolation in databases refers to one of the ACID properties that ensures transactions do not interfere with each other. 
+It controls how and when the changes made by one transaction become visible to other concurrent transactions.
+
+In a multi-user environment, multiple transactions run at the same time.
+Without isolation, you can face issues like:
+
+Dirty Reads:A dirty read happens when a transaction reads data that has been modified by another transaction but not yet 
+committed. If the second transaction rolls back, the first transaction has read invalid data.
+
+Example Scenario
+Imagine two transactions in a banking system:
+
+Transaction A: Updates account_balance from $1000 to $500 (withdraws $500).
+Transaction B: Reads account_balance while Transaction A is still in progress (before commit).
+
+Steps:
+
+Transaction A starts and updates the balance to $500 but hasn't committed yet.
+Transaction B reads the balance as $500 and uses it for some calculation (e.g., approving a loan).
+Transaction A rolls back due to an error, restoring the balance to $1000.
+Transaction B has made decisions based on incorrect data ($500), which is a dirty read.
+
+
+Non Repeatable Read;
+====================
+A non-repeatable read occurs when a transaction reads the same row twice and gets different values because another 
+transaction modified and committed the data in between.
+
+Telecom Postpaid CRM Example
+Imagine two transactions:
+
+Transaction A (Customer Care Agent): Viewing a customer’s outstanding bill during a call.
+Transaction B (Billing System): Updates the customer’s bill after adding roaming charges.
+
+
+Steps
+
+Transaction A reads outstanding_amount = ₹1,000 for customer John.
+Transaction B adds roaming charges and commits the update:
+outstanding_amount = ₹1,500.
+Transaction A reads the same row again (maybe to confirm before payment) and now sees ₹1,500.
+
+The two reads in Transaction A gave different results → Non-repeatable Read.
+
+Why It Happens
+
+Occurs in READ COMMITTED isolation level.
+Prevented by REPEATABLE READ or SERIALIZABLE, which lock rows for the duration of the transaction.
+
+A phantom read happens when a transaction executes the same query twice and gets different sets of rows because another transaction inserted or deleted rows in between.
+
+Telecom CRM Phantom Read Example
+Imagine two transactions:
+
+Transaction A (Customer Care Agent): Fetches all postpaid customers with outstanding bills > ₹1,000 to send reminders.
+Transaction B (Billing System): Inserts a new record for a customer who just got billed ₹2,000.
+
+In spring boot application we make use of @Transactional(propogation=, isolation=isolation.) In this way, we declare it.
+Isolation levels:
+1. Default.
+2. Read uncomitted.
+3. Read Comitted.
+4. Repeatable Read.
+5. Serializable.
+=================================================================================
+Read Comitted,
+
+1. When Transaction A updates a row, that change is not visible to other transactions until A commits.
+Transaction B, operating under READ COMMITTED, will only see the last committed value, not the uncommitted one.
+
+2. Repeatable Read:
+
+Goal: Prevent dirty reads and non-repeatable reads.
+How: When a transaction reads a row, it locks that row so no other transaction can modify it until the first one finishes.
+Example (Telecom CRM):
+
+Transaction A: Reads customer’s outstanding bill = ₹1,000.
+Transaction B: Tries to update bill to ₹1,500 → blocked until A completes.
+So A will always see ₹1,000 during its transaction → no non-repeatable read.
+
+
+Still allows: Phantom reads (new rows can appear if another transaction inserts).
+3. Goal: Prevent dirty reads, non-repeatable reads, and phantom reads.
+How: Treats transactions as if they run one after another (full range locks).
+Example (Telecom CRM):
+
+Transaction A: Queries all customers with bills > ₹1,000.
+Transaction B: Tries to insert a new customer with ₹2,000 bill → blocked until A finishes.
+So A sees a consistent set of rows → no phantom read.
+
