@@ -1,0 +1,43 @@
+ 1. Purpose
+
+G1 GC: Designed for low pause times while still achieving good throughput. Ideal for large heaps (multi-GB) but not extreme sizes.
+ZGC: Designed for ultra-low pause times (sub-millisecond) even with very large heaps (up to terabytes).
+
+
+✅ 2. Heap Size Support
+
+G1 GC: Efficient for heaps up to tens of GBs.
+ZGC: Scales to multi-terabyte heaps without increasing pause times.
+
+
+✅ 3. Pause Times
+
+G1 GC: Pause times are typically in the range of 10–100 ms, depending on tuning and heap size.
+ZGC: Pause times are always below 10 ms, often sub-millisecond, regardless of heap size.
+
+
+✅ 4. Algorithm
+
+G1 GC: Region-based collector; divides heap into regions and prioritizes garbage collection based on "garbage first" principle.
+ZGC: Uses colored pointers and load barriers for concurrent relocation, making most work concurrent with application threads.
+
+
+✅ 5. Concurrency
+
+G1 GC: Mostly concurrent, but still has stop-the-world phases for marking and cleanup.
+ZGC: Almost fully concurrent; minimal stop-the-world phases (usually under 1 ms).
+
+
+✅ 6. Use Cases
+
+G1 GC: Good for server-side applications with moderate heap sizes and predictable pause requirements.
+ZGC: Best for large-scale applications, in-memory databases, or real-time systems where ultra-low latency is critical.
+
+
+✅ 7. Availability
+
+G1 GC: Default GC in many modern JVMs (Java 9+).
+ZGC: Available since Java 11, improved in later versions.
+
+
+=========================================================================================================
