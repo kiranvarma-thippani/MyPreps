@@ -1,0 +1,49 @@
+Maven Version Conflicts:
+=========================
+
+✅ What is a version conflict?
+
+Two dependencies (or their transitive dependencies) require different versions of the same library.
+Example:
+spring-boot-starter-web needs jackson-databind:2.15
+Another library needs jackson-databind:2.13
+
+
+✅ What does Maven do by default?
+Maven uses the nearest definition rule:
+
+It builds a dependency tree.
+It picks the version that is closest to your project in that tree.
+If both are at the same level, Maven picks the first one declared in your pom.xml.
+
+So, Maven does not fail—it silently chooses one version and ignores the other.
+
+✅ What are the risks if you ignore conflicts?
+
+Runtime errors: If the library expects methods from a newer version but Maven picked an older one, you get NoSuchMethodError or ClassNotFoundException.
+Unexpected behavior: Features might not work as expected.
+Security issues: Older versions may have vulnerabilities.
+Hard-to-debug problems: Everything compiles, but crashes at runtime.
+
+
+✅ How to detect conflicts?
+Run:
+Shellmvn dependency:treeShow more lines
+This shows all dependencies and their versions. Look for duplicates with different versions.
+
+✅ How to fix conflicts?
+
+Use <dependencyManagement> to enforce one version globally.
+Use <exclusions> to remove unwanted transitive dependencies.
+Use a BOM (Bill of Materials) like Spring Boot BOM to manage versions automatically.
+
+
+✅ In short:
+If you have version conflicts, Maven does not throw an error—it picks one version based on its rules. But this can cause runtime issues, so you must manage versions explicitly
+
+
+Proxy settings (for internet access)
+Credentials for private repositories (Nexus, Artifactory)
+Mirror settings (use company Nexus instead of Maven Central)
+Custom local repository path
+
