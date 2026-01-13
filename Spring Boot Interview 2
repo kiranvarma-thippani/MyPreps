@@ -1,0 +1,149 @@
+Tomcat tomcat=new Tomcat();
+Context ctx=new Context("",null);//context is the webapplication running in the tomcat., docbase is the path to that webapp
+Tomcat.addServlet(ctx, "helloServlet", new HelloServlet());
+ctx.addServletMappingDecode("/hello","helloservlet");
+tomcat.start();
+tomcat.getServer().await
+
+===============================================================================================
+
+1.Servlet creation by defining a class extending the httpservlet, use service method to handle the incming requests.
+2. create a maven project and in which add the embeded tomcat dependancy and java Servlet API in it.
+3. Create a class in the method create a Tomcat Object.
+Add servlet to that tomcat servlet container.
+Configure the context.
+4. map the servlet to the context using addServletMappingDecode method("path", name of servlet)
+
+===============================================================================================
+1. Create a spring boot app.
+2. create a controller of method home that returs index.jsp page defined in the src/main/resources that return a jsp page.
+3. In order to make our application to support the JSP add jasper dependancies in the pon.xml.
+4. Now it supports.
+5. Define a form data and return it in the add controller. and on submit it should redirect to the some other controller method
+which should return the jsp page.
+6. for getting the input we can use either @requestParam or HttpServletRequest. and if we use HttpServletRequest, we should
+use req.getParameter("num1") and parse it. for using the result in the jsp page we can either use sessionAttributes
+HttpSession session, session.setAttribute("result") and we can get this using session.getAttribute., In stead of this
+we can use directly use the variable in jsp by addig the jstl dependancy.
+==============================================
+@RequestParam:
+----------------
+-> from query params.
+-> Using @RequestParams we can specify what value should be retrieved from request url and bind it method parameter.
+-> By default required, we can set an optional value using defaultValue keyword. throws bad request
+-> @RequestParam(value="man", required=false, defaultValue="kittu"
+
+@PathVariable
+==============
+-> We define place holder in the request url using curly braces and bind these place holders with the method parameters.
+-> By default, it is required and gives 404 if not specified,
+-> we can make it optional using required=false. No default value.
+
+View Resolver:
+==============
+A Spring ViewResolver is an interface that maps a logical view name returned by a controller to an actual view, such as a 
+JSP file or an HTML template. It handles the process of resolving this name into a concrete view implementation, often by 
+using configured prefixes and suffixes to construct the full path to the view file, which keeps the controller code cleaner 
+and more decoupled from the view's physical location. 
+
+result
+
+
+spring.mvc.view.prefix=/path/
+                                   } src/mmain/resources/result
+spring.mvc.view.suffix=.jsp
+
+
+Advantages of View Resolver
+The advantages of View Resolver in Spring MVC include:
+Flexibility: View Resolver allows multiple view technologies to coexist in the same application, enabling developers to choose the most suitable technology for their specific needs. 
+3
+Loose Coupling: View Resolver provides a loose coupling between the controller and the view component, allowing for easier replacement of view technologies in the future. 
+1
+Performance: View resolvers can cache views, which improves performance by reducing the overhead of resolving views on every request. 
+1
+Configuration Flexibility: View Resolver can be configured to handle different types of views, such as JSPs for some views and Thymeleaf for others. 
+1
+Cache Management: View resolvers can cache view instances, which can be turned off by setting the cache property to false. 
+1
+
+These advantages make View Resolver a powerful tool in Spring MVC, enhancing the flexibility and performance of web applications
+
+Model Object
+===========
+1. It is used to pass the data from the controller layer to the view layer respectively.
+2. It acts a container of attributes that the view layer can access and use the attributes to render the data.
+
+ModelAndView:
+==========
+1. Its a helper class, which combines the data and view into a single object.
+2. when the controller sends the ModelView object to dispatcher servlet, it consults the view resolver which maps the
+logical view name to actual implementation using the prefixes and suffixes.
+
+@ModelAttribute:
+===============
+1. It binds the form data to the java object and add the attributes to the model object(container which is used in the view
+for rendering the data.]]
+2. It is also used to add the common data for all the views.
+
+
+COnfiguring multiple view Resolvers:
+==================================
+@Configuration
+@EnableWebMvc
+public class WebConfig implements WebMvcConfigurer {
+
+    // 1. BeanNameViewResolver (for special views like PDF)
+    @Bean
+    public BeanNameViewResolver beanNameViewResolver() {
+        BeanNameViewResolver resolver = new BeanNameViewResolver();
+        resolver.setOrder(0); // Highest priority
+        return resolver;
+    }
+
+    // 2. InternalResourceViewResolver (for JSP)
+    @Bean
+    public InternalResourceViewResolver jspViewResolver() {
+        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+        resolver.setPrefix("/WEB-INF/views/");
+        resolver.setSuffix(".jsp");
+        resolver.setOrder(1);
+        return resolver;
+    }
+
+    // 3. ThymeleafViewResolver (if using Thymeleaf)
+    @Bean
+    public ThymeleafViewResolver thymeleafViewResolver(SpringTemplateEngine templateEngine) {
+        ThymeleafViewResolver resolver = new ThymeleafViewResolver();
+        resolver.setTemplateEngine(templateEngine);
+        resolver.setOrder(2);
+        return resolver;
+    }
+}
+
+=========================================================================
+Dispatcher Servlet:
+===================
+� Key Responsibilities of DispatcherServlet: 
+● Front Controller: 
+○ Centralized entry point for all HTTP requests in Spring MVC. 
+○ Intercepts requests and delegates them to appropriate controllers, 
+following the Front Controller design pattern. 
+● Routing Requests: 
+○ Identifies the correct controller based on URL mapping. 
+○ After processing, it decides which view (e.g., JSP, Thymeleaf) to 
+render. 
+● Integration with Spring Components: 
+○ Works with Handler Mappings (to map requests to controllers), View 
+Resolvers (to select the view), and Exception Handlers for error 
+management. 
+● Request Lifecycle: 
+○ Receives a request, maps it to a controller, processes it, and resolves the 
+view to display the response, which is then sent back to the client.
+
+==========================================================================
+
+
+
+
+
