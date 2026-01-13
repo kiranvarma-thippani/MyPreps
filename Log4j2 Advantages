@@ -1,0 +1,53 @@
+
+✅ 1. Better Performance
+
+Asynchronous Logging in Log4j2 uses LMAX Disruptor, which is extremely fast and designed for high-throughput, low-latency systems.
+Logback also supports async logging, but it relies on standard Java queues, which are slower compared to Disruptor.
+
+
+✅ 2. Garbage-Free Logging
+
+Log4j2 is designed to minimize object creation during logging, reducing GC pauses.
+Logback creates more temporary objects, which can lead to higher garbage collection overhead in high-load environments.
+
+
+✅ 3. More Flexible Configuration
+
+Log4j2 supports XML, JSON, YAML, and Properties configuration formats.
+Logback primarily supports XML (and Groovy optionally), making Log4j2 more versatile.
+
+
+✅ 4. Advanced Filtering
+
+Log4j2 allows filters at multiple levels: context, logger, and appender.
+Logback has filters but they are less granular compared to Log4j2.
+
+
+✅ 5. Plugin Architecture
+
+Log4j2 is highly extensible with a plugin system for custom appenders, layouts, and filters.
+Logback is extensible but lacks a formal plugin architecture.
+
+
+✅ 6. Dynamic Configuration Reload
+
+Log4j2 can automatically reload configuration files without restarting the application.
+Logback supports reloading but is less robust and requires additional setup.
+
+
+✅ 7. Built-in Support for Async Context Data
+
+Log4j2 provides Thread Context Map (MDC) and Thread Context Stack (NDC) with async support.
+Logback supports MDC but async handling is less optimized.
+
+
+✅ 8. Lookups
+
+Log4j2 supports Lookups for dynamic values (e.g., environment variables, system properties).
+Logback does not have an equivalent feature.
+
+
+✅ 9. Performance Benchmarks
+
+In most benchmarks, Log4j2 outperforms Logback, especially in asynchronous mode.
+
