@@ -1,0 +1,201 @@
+Iterable interface is the root interface for the collection frame work.
+1. If a class implements this iterable interface, then the objects of this class can be iterated using iterator or enhanced for loop.
+2. Iterable interface consists of three methods as shown below:
+
+public interface Iterable<T> {
+    Iterator<T> iterator();                             // abstract method
+    default void forEach(Consumer<? super T> action);   // Java 8
+    default Spliterator<T> spliterator();               // Java 8
+}
+
+3. iterator() → abstract
+4. forEach(Consumer) → default
+5. spliterator() → default
+
+-> In order to ensure that the java needs a standard way to iterate the different java collections.
+
+Iterable -> Gives iterator
+Iterator -> provides the actual traversAL.
+
+Enhance for loop -> for(DataType var: collection) uses iterator internally. Compiler converts the enhanced for loop into the iterator fashion internally.
+
+list.forEach(x->System.out.println(x)) -> It is used for iteration in the functional way.
+
+--------------------------------------------------------------------------------------------------------------------
+Internal Working of Iterator:
+-------------------------------
+
+1. You call iterator()
+2. Collection returns its
+ internal Iterator implementation (private inner class)
+3. Iterator uses:
+      i.cursor to track current position
+      ii.expectedModCount to detect modifications (fail-fast)
+4. hasNext() checks if more elements exist
+5. next() returns element + moves cursor
+
+===================================================
+
+Custom Iterable Example:
+-----------------------
+
+public class MyIterable implements Iterable<String> {
+
+    private String[] data = {"A", "B", "C"};
+
+    @Override
+    public Iterator<String> iterator() {
+        return Arrays.asList(data).iterator();
+    }
+}
+
+========================================================
+
+Spliterator
+-----------
+Spliterator works like an Iterator, but smarter
+It can:
+1. Traverse elements
+2. Split itself into two smaller Spliterators
+3. Provide size estimates
+4. Provide characteristics that help the Stream optimize work.
+
+Core methods of Spliterator:
+----------------------------
+
+boolean tryAdvance(Consumer<? super T> action);
+void forEachRemaining(Consumer<? super T> action);
+
+Spliterator<T> trySplit();
+long estimateSize();
+int characteristics();
+
+tryAdvance() Internal working :
+-------------------------------
+Moves to the next element
+Executes the action on that element
+Returns true if an element was processed
+Returns false when iteration is complete
+
+forEachRemaining(Consumer):
+----------------------------
+Loops internally using tryAdvance()
+Processes all remaining elements
+Optimized for performance
+
+ trySplit() — The Heart of Spliterator
+ =======================================
+ Internal logic:
+
+Take the current range of elements
+Split it into two subranges (almost equal halves)
+Return a new Spliterator for the first half
+Keep the second half for itself
+If splitting is not possible → return null
+This is how parallel stream divide the stream of data and makes use of the multiple threads. 
+
+
+estimateSize() 
+Returns remaining elements count.
+Useful for:
+
+Load balancing
+Optimizing splitting
+Predicting work size
+
+
+characteristics()
+
+
+
+
+==========================================================================================================
+
+What is ListIterator?
+ListIterator is a special iterator in Java that is used only with List implementations like:
+
+ArrayList
+LinkedList
+Vector
+
+It allows you to traverse the list in both directions and modify elements while iterating.
+
+Key Features of list iterator:
+------------------------------
+1. List Iterator is used in only the lists.
+2. It supports both forward and backward traversal.
+3. It supports set(), add() and retrives the indexes as well.
+4. We can create a listiterator from a specific index in the list.
+
+Adding the element into the list using listiterator:
+
+ListIterator<String> itr = list.listIterator();
+
+while (itr.hasNext()) {
+    String val = itr.next();
+    if (val.equals("B")) {
+        itr.add("X");
+    }
+}
+
+Updating current element:
+========================
+
+if (val.equals("A")) {
+    itr.set("Z");
+}
+
+
+Internal Working (Interview Point 💡)
+------------------------------------
+
+ListIterator keeps cursor position
+Cursor sits between elements, not on elements
+That’s why it can move:
+
+Forward → next()
+Backward → previous()
+
+
+===========================================================
+
+Fails-fast iterator:
+-------------------
+Fail‑fast iterator is an iterator that throws a ConcurrentModificationException if a collection is structurally modified while it is being iterated (except through the iterator’s own remove() method).
+
+
+Java collections internally maintain a variable called modCount (modification count).
+This count is incremented whenever there is a structural modification, such as adding or removing elements from the collection.
+
+
+When an iterator is created, it takes a snapshot of the current modCount and stores it in a variable called expectedModCount.
+
+
+During each iteration step (next(), hasNext()), the iterator compares expectedModCount with the collection’s modCount.
+
+If both values are equal → iteration continues normally.
+If they differ → it means the collection was modified during iteration, and the iterator fails fast by throwing a ConcurrentModificationException.
+
+
+
+Fail‑fast iterators are mainly designed to detect bugs early and prevent unpredictable behavior, especially in single‑threaded environments where accidental modification during iteration is a common mistake.
+
+
+Fail-Safe Iterator:
+---------------
+Fail safe iterator is the iterator which does not throw any exception even though if we do any structural changes while iterating.
+
+-> Fail safe iterators will be using the copy or snapshot of the collections which is taken at the time of iterator object creation.
+-> If at all if any structural changes made to the original collections, These changes are not affected to the snapshot or copy of the original collection.
+-> These fail safe iterators are mainly used for safety instead of performance.
+--> For example, Collections like concurrenthashmap, copyonwriteArraylist uses the fail safe iterators.
+
+
+==================================================================================================================================================================
+
+
+
+
+
+
+
