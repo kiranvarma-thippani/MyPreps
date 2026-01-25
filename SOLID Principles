@@ -1,0 +1,188 @@
+Solid principles are the 5 design principle which are helpful in the scalable, maintainable software devolopment.
+S - Single responsibilities.
+O - Open for extension and closed for modification.
+L - Liskov substitution principle.
+I - Interface Seggregation principle.
+D - Dependancy Inversion Principle.
+
+Single Responsibility Principle:
+-----------------------------
+1. SRP states that a class should only have one reason to change. It should be responsible for doing a single process but perfectly.
+Bad Design:
+class UseSrService{
+void createUser(User u){}
+void sendEmail(User u){}
+void generateReport(){}
+}
+Good design:
+class UserService{
+void createUser(User u){}
+}
+class EmailService(User u){
+void sendEmail(User u){}
+}
+class ReportService{
+void generateReport(){}
+}
+
+1. Improved Maintainability & Reduced Risk: When a class has only one responsibility, it is less likely to break unrelated functionalities when changes are made.
+2. Enhanced Readability & Understandability: Small, focused classes are easier to understand than large, "god" classes that do too many things.
+3. Better Testability: A single-responsibility class requires fewer tests to cover all scenarios, as there are fewer dependencies.
+4. Reduced Coupling & High Cohesion: It promotes loosely coupled code, which makes it easier to change or replace components.
+5. Parallel Development: Smaller, separated classes allow different developers to work on different parts of the system simultaneously without interfering with each other.
+
+==========================================================================================================
+2. Open for extension, closed for modification:
+ The Open-Closed Principle (OCP) states that software entities (classes, modules, functions) should be open for extension but closed for modification. This allows adding new 
+ functionality by writing new code, rather than altering existing, tested code, which prevents bugs, reduces maintenance risks, and enables, easier, more reliable software expansion
+Example:
+Bad Design:
+----------
+class NotificationService {
+    void send(String type) {
+        if(type.equals("EMAIL")) {}
+        else if(type.equals("SMS")) {}   // keeps growing
+    }
+}
+
+Good Design:
+-----------
+interface Notification {
+    void send();
+}
+
+class EmailNotification implements Notification {
+    public void send() {}
+}
+
+class SmsNotification implements Notification {
+    public void send() {}
+}
+
+Reduced Regression Risks: Because original code is not modified, existing functionality is less likely to break.
+Improved Maintainability: Changes are encapsulated in new, separate code (e.g., in a new subclass or class) rather than mixed in with old code.
+Better Code Design: Encourages the use of interfaces and abstract classes to create robust, polymorphic code.
+Historical Context: Originally, this principle helped avoid the need to recompile or retest large, tightly coupled libraries, ensuring stability. 
+
+=========================================================================================
+3. Liskov Substitution priniciple:
+  The Liskov Substitution Principle (LSP) states that child classes (subclasses) must be able to replace parent classes (base classes) without breaking the application. 
+  Essentially, if a program works with a Bird class, it should work perfectly with a Duck or Penguin class, without needing to know which subclass it is using. 
+
+  If B is a subclass of A, you should be able to replace A with B, and the code should still work correctly.
+Uses:
+---------
+   Ensures correct inheritance
+   Avoids broken behavior when using polymorphism
+   Makes code predictable and safe
+   Helps maintain design consistency
+
+Bad Design:
+
+class Bird {
+    void fly() { System.out.println("Flying"); }
+}
+
+class Ostrich extends Bird {
+    @Override
+    void fly() {
+        throw new UnsupportedOperationException("Ostriches can't fly");
+    }
+}
+
+Good Design:
+-----------
+
+interface Bird {}
+interface FlyingBird {
+    void fly();
+}
+
+class Sparrow implements FlyingBird {
+    public void fly() {}
+}
+
+class Ostrich implements Bird {}
+==============================================================
+Interface segregation principles:
+---------------------------------
+Interface segregation principle states that no client should be forced to depend on the methods that it does not use.
+
+In practise, we break the fat interface into small and specific interfaces based on the client centric design
+
+If you create one big fat interface, many implementing classes will:
+
+Implement methods they don’t need
+Leave methods empty
+Throw UnsupportedOperationException()
+Become confusing and tightly coupled
+
+ISP fixes this by splitting large interfaces into smaller, purpose‑specific ones.
+BAd Example:
+------------
+interface Worker {
+    void work();
+    void eat();
+}
+
+class Robot implements Worker {
+    public void work() {}
+    public void eat() {}  // ❌ Robots don’t eat
+}
+Good Example:
+------------
+
+interface Workable {
+    void work();
+}
+
+interface Eatable {
+    void eat();
+}
+
+class Human implements Workable, Eatable {
+    public void work() {}
+    public void eat() {}
+}
+
+class Robot implements Workable {
+    public void work() {}  // Robot only works
+}
+ Benefits:
+----------
+1. Promotes loose coupling, 
+2. Maintainable
+3. Testable.
+============================================
+Dependancy inversion principle:
+It states 2 points namely:
+1. High modules should not depend on the low level modules. Both should depend on Abstraction.
+2. Abstractions should not depend on details. Details should depend on Abstractions.
+
+1. Promotes loose coupling.
+Reduced Coupling: High-level code is shielded from changes in low-level implementations. If you switch from a file 
+logger to a cloud logger, you only modify the low-level implementation, not the high-level business logic that uses it.
+2. ENhances the testability, increases the maintainability.
+Abstractions make it easy to isolate modules for unit testing. You can use mock objects or test doubles for dependencies 
+(like a mock database) instead of relying on a complex, real-world service
+3. Separation of Concerns: It forces a clear separation between what a system does (high-level policy/business logic) and 
+how it does it (low-level implementation details). 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
