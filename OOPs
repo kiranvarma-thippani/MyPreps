@@ -21,6 +21,10 @@ Oops stands object oriented programing, The main pillars of the OOPs are
 ===============
 Abstraction is the process of hiding the unnecceary implementation details to the outside world or the user and only provides the 
 fucntionality. In other words, we can say that user will have the idea on what the object does rather than how it does.
+Reduces complexity
+Increases security (hide internal logic)
+Helps achieve loose coupling
+Makes code easier to maintain
 
 Car Example like starting the car.
 
@@ -111,7 +115,14 @@ WHy Abstract methods:
 
 3. use extends to inherit the abstract class methods.
 
-
+When to use Abstract clas:
+-------------------------
+1. You need instance fields shared by all subclasses.
+2. You need a constructor to enforce invariants.
+3. You expect to evolve the base type without breaking implementors.
+4. Interface default methods cannot hold the state.
+5. Interface cannot have the constructors and abstract class do have the constructor which can be used for initialising the fields of the abstract class.
+6. we cannot have private helper methods.
 Tricky Question:
 
 1. Can an abstract class implement an interface without implementing all its methods?
@@ -328,8 +339,101 @@ Sensitive data can be hidden from external access, reducing the risk of accident
 Changes to internal implementation don’t affect external code using the class.
 
 ==========================================================================================================================
-Polymorphism means one thing behaving in different ways. In Java, it allows methods to do different things based on the object calling ]
-them — like the same method name working differently in different classes.
+Polymorphism:
+-------------
+Polymorphism is a fundamental concept in object-oriented programming (OOP) that allows a single entity, such as a method or object, to take on multiple forms. In Java, polymorphism enables methods 
+or objects to behave differently based on their context, particularly at runtime.
+Polymorphism in Java allows the same method to behave differently based on the object at runtime (overriding) or based on parameters at compile time (overloading)
 
-method and reference callings.
+Two types of polymorphism:
+1. Compile time polymorphism.
+2. Runtime Polymorphism
+
+1. Compiletime polymorphism is also called as method overloading
+Multiple methods with the same name but different parameters (type, number, or order).
+Method Overloading
+-----------------
+class Calculator {
+    int add(int a, int b) {
+        return a + b;
+    }
+
+    double add(double a, double b) {
+        return a + b;
+    }
+2. Runtime polymorphism: Also called Method Overriding.
+Definition:
+A subclass provides a specific implementation of a method that is already defined in the parent class.
+👉 Decision happens at runtime based on the object type, not reference type.
+}
+
+2. Method Overriding:
+-----------------------
+Method overriding in Java occurs when a subclass provides its own implementation of a method that is already defined in its 
+superclass. The method in the child class must have the same name, return type, and parameters as the one in the parent class. 
+This allows the subclass to tailor or extend the functionality of the inherited method. 
+
+Rules for Method overriding:
+---------------------
+Same Method Signature: The method name, return type, and parameter list must be exactly the same as in the superclass.
+
+Inheritance is Required: Overriding can only occur between a subclass and its superclass.
+
+Access Modifier Must Not Be More Restrictive: The overriding method cannot have a more restrictive access modifier than the method in the parent class.
+
+Return Type Must Be Same or Covariant: The return type must be the same or a subclass of the original return type (covariant return type).
+
+Final Methods Cannot Be Overridden: A method declared as final in the superclass cannot be overridden in the subclass.
+
+Static Methods Cannot Be Overridden (Only Hidden): Static methods are class-level, and they cannot be overridden; only method hiding applies.
+
+Private Methods Cannot Be Overridden: Private methods are not inherited, hence cannot be overridden.
+
+Constructors Cannot Be Overridden: Constructors are not inherited, and therefore cannot be overridden.
+
+Exception Handling Rules Must Be Followed: The overriding method cannot throw broader checked exceptions than the overridden method.
+
+==================================================================================================================================
+Association, Aggregation, and Composition define how objects in OOP relate, ranging from weak links to tight ownership. Association is a generic "uses-a" relationship. 
+Aggregation is a "has-a" (aggregation) relationship where parts exist independently of the container. Composition is a strict "part-of" relationship where the child cannot exist without the parent. 
+1. Association (Weakest)
+Definition: A general relationship between two independent objects, defining how they collaborate.
+Nature: Neither object owns the other; both can exist independently.
+Example: A Teacher and a Student. They are associated, but one does not own the other.
+UML: A simple line connecting two classes. 
+2. Aggregation (Medium)
+Definition: A special form of association representing a "has-a" relationship, where one object (container) uses another (part).
+Nature: The child object can exist independently of the parent container.
+Example: A Library and Books. If the library is destroyed, the books still exist.
+UML: A line with a hollow diamond on the container side. 
+3. Composition (Strongest)
+Definition: A strict, restricted form of aggregation where the child object cannot exist without the parent.
+Nature: The container owns the lifecycle of the child; if the container is destroyed, the child is destroyed.
+Example: A House and its Rooms. If the house is destroyed, the rooms cease to exist as part of it.
+UML: A line with a filled (solid) diamond on the container side. 
+
+
+==============================
+Covariant return type:
+Basically we see this covariant return type in the method iver riding, this states that the return type can be of subclass type when
+the parent type is expected.
+
+subclass can be used as the return type.
+
+==========================================================
+Cohesion and Coupling:
+-----------------------
+1. Cohesion (Intra-module)
+Definition: Cohesion refers to the degree to which the elements inside a single module or class are related and focused on a single, well-defined purpose. It is the "internal glue".
+What to aim for: High Cohesion. A class should do one thing and do it well (Single Responsibility Principle).
+Example of High Cohesion: A UserAuthService class that only handles login, logout, and password reset.
+Example of Low Cohesion: A UserUtility class that handles authentication, formats dates, and sends emails. 
+2. Coupling (Inter-module)
+Definition: Coupling refers to the degree of interdependence between different modules, classes, or components. It measures how closely connected they are.
+What to aim for: Low Coupling (Loose Coupling). Modules should function independently, with minimal knowledge of each other's internal workings.
+Example of High Coupling (Bad): Module A directly modifies the internal variables of Module B. If B changes, A breaks.
+Example of Low Coupling (Good): Module A interacts with Module B only through a well-defined public interface (API). 
+==============================================================
+
+
 
