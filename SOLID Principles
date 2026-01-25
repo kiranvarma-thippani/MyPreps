@@ -168,6 +168,62 @@ Abstractions make it easy to isolate modules for unit testing. You can use mock 
 3. Separation of Concerns: It forces a clear separation between what a system does (high-level policy/business logic) and 
 how it does it (low-level implementation details). 
 
+bad Design:
+class CreditCard {
+    void pay() {
+        System.out.println("Paid using credit card");
+    }
+}
+
+class PaymentService {
+    private CreditCard card = new CreditCard();
+
+    void makePayment() {
+        card.pay();  // tightly coupled
+    }
+}
+
+Good Design:
+interface PaymentMethod {
+    void pay();
+}
+
+class CreditCard implements PaymentMethod {
+    public void pay() {
+        System.out.println("Paid using Credit Card");
+    }
+}
+
+class UPI implements PaymentMethod {
+    public void pay() {
+        System.out.println("Paid using UPI");
+    }
+}
+
+
+class PaymentService {
+    private PaymentMethod method;
+
+    PaymentService(PaymentMethod method) {
+        this.method = method;
+    }
+
+    void makePayment() {
+        method.pay();  // loosely coupled
+    }
+}
+
+
+public static void main(String[] args) {
+    PaymentService service = new PaymentService(new UPI());
+    service.makePayment();
+}
+
+
+
+
+
+
 
 
 
