@@ -1,0 +1,53 @@
+
+
+//Sorting the Employee with age and then location.
+	List<Employee> employees=	employeeList.stream()
+		.sorted(Comparator
+				.comparing(Employee::getAge)
+				.thenComparing((o1,o2)->o1.getLocation().compareToIgnoreCase(o2.getLocation())))
+		        .collect(Collectors.toList());
+		         System.out.println(employees);	
+	}
+=================================================================================
+//Grouping the employee based upon their department and revealing the names only.
+ Map<String, List<String>> mapGroup= employeeList.stream()
+	     .collect(Collectors.groupingBy(Employee::getDeptName,
+	    		 Collectors.mapping(Employee::getName,Collectors.toList()))); // Here always check the closing brace, when u are specifing down stream it should be in groupingby only.
+	  for(Map.Entry e:mapGroup.entrySet()) {
+		  System.out.println(e.getKey()+" "+e.getValue()); 
+===========================================================================================================
+max() for Intstream,
+maxBy() in groupingby()-> maxBy() Takes Comparator. For Comparing double or float values use Comparator.comparingDouble() etc.
+
+//Program for grouping the employees with respect to the Department and max salary for each .
+ Map<String, Optional<Employee>> mapGroup= employeeList.stream()
+	     .collect(Collectors.groupingBy(Employee::getDeptName,
+	    		 Collectors.maxBy(Comparator.comparingDouble(Employee::getSalary)))); // If you use the online compiler, just import the java.util.*, java.util.stream.*
+===============================================================================================================
+ 
+// If you want to return only highest salary of the employee per department.
+// If you want to provide the final transformation for collected list. Then you can make use of this .Collectors.collectingAndThen
+Map<String, Object> mapGroup= employeeList.stream()
+	     .collect(Collectors.groupingBy(Employee::getDeptName,
+	    Collectors.collectingAndThen(Collectors.maxBy(Comparator.comparingLong(Employee::getSalary)), 
+	    				 e->e.get().getSalary())));
+	    System.out.println(mapGroup);
+
+==================================================================================================================
+	  Top 2 Salaries in each department.
+Map<String, List<Long>> mapGroup= employeeList.stream()
+	     .collect(Collectors.groupingBy(Employee::getDeptName,
+	    Collectors.collectingAndThen(Collectors.toList(),
+	    		list->list.stream().map(i->((Employee)i).getSalary())
+	    	 .sorted(Comparator.reverseOrder()).limit(2).collect(Collectors.toList()))));	
+==================================================================================================================
+second highest salary:
+Long i= employeeList.stream()
+	    		.map(Employee::getSalary).sorted(Comparator.reverseOrder()).skip(1).findFirst().get();  
+=======================================================================================================================
+	     
+
+
+
+
+
