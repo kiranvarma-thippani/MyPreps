@@ -45,6 +45,36 @@ second highest salary:
 Long i= employeeList.stream()
 	    		.map(Employee::getSalary).sorted(Comparator.reverseOrder()).skip(1).findFirst().get();  
 =======================================================================================================================
+Group The Employees using their id and if two employees are having same id, just return only the the employee with highest salary.
+employeeList.stream().collect(Collectors.toMap(Employee::getId, e->e, (e1,e2)->e1.salary()>=e2.getSalary()?e1:e2));
+
+==============================================================================================================
+1. You are given a Lit<Employee>.
+2. Each Employee has list of skills represented as List<String>.
+3. write a java 8 solution to return a unique , sorted list of skills across all the skills.
+
+empList.stream().flatMap(e->e.getSkills().stream()).distinct().sorted().collect(Collectors.toList());
+==============================================================================================================
+
+Given a list of employee, sort by salary in descending order and as tie breaker sort the salary using name in asc (case sensitive)
+empList.stream().sorted(Comparator.comparingDouble(Employee::getSalary).reversed().thenComparing(e->e1.getName())).
+collect(Collectors.toList());
+
+
+List<Employee> sorted =
+    empList.stream()
+           .sorted(
+               Comparator.comparingDouble(Employee::getSalary)
+                         .reversed() // salary desc
+                         .thenComparing(Employee::getName, String.CASE_INSENSITIVE_ORDER
+
+empList.stream().sorted(Comparator.comparingDouble(Employee::getSalary).reversed()
+.thenComparing(Employee:getEmployee, Comparator.nullsLast(String.CASE_SENSITIVE_ORDER);
+======================================================================================================================
+
+
+
+
 	     
 
 
