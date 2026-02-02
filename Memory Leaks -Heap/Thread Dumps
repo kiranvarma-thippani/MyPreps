@@ -28,7 +28,7 @@ what we should use:
 Tools:
 ------
 GC Easy -> For Analysing the logs, It will tell you memory leak objects, 
-Heap Hero,
+Heap Hero-> f
 
 
 Reason 2:
@@ -178,5 +178,121 @@ Tools :
 -----
 1. Eclipse MAT
 2. Heap Hero.
+
+Common causes of memory leaks
+=============================
+
+Unbounded collections
+==============
+Keeping objects in List/Map/Set without removal (e.g., caching responses/users without TTL/eviction).
+Keys with poor cardinality causing ever-growing maps.
+
+
+
+Static references & singletons
+==============================
+static fields holding large graphs (e.g., caches, DTOs).
+Singletons retaining references to request/session objects.
+
+
+
+Listeners/Callbacks not removed
+==============================
+Event listeners/observers (e.g., GUI, RxJava/Reactor) registered but never deregistered/disposed.
+
+
+
+ThreadLocal misuse
+=================
+Not clearing ThreadLocal in thread pools (app servers reuse threads → data sticks around).
+Large objects stored in ThreadLocal (e.g., SimpleDateFormat, byte buffers).
+
+Not closing resources (I/O & DB)
+===============================
+Missing close() on InputStream, OutputStream, ResultSet, Statement, Connection, ZipFile, HttpClient responses, etc.
+Not using try-with-resources.
+
+
+
+Leaking threads / executors
+==========================
+Creating threads/timers that are never stopped.
+ExecutorService not shutdown() → threads + task queues retain objects.
+
+
+
+ClassLoader leaks (app servers)
+==========================
+Static singletons stored in libraries referencing app classes.
+JDBC drivers, logging frameworks, or Timer tasks loaded by app ClassLoader and never deregistered on redeploy.
+ThreadLocal values referencing webapp classes.
+
+
+
+Improper caching strategies
+=========================
+Caches without eviction/size limits.
+Using strong references instead of WeakReference/SoftReference where appropriate.
+
+
+
+Long-lived sessions/scopes
+=============================
+Storing heavy objects in HTTP session or Spring singleton scope (e.g., request data, file bytes).
+
+
+
+Retaining large temporary data
+============================
+Accumulating logs/metrics/batch records in memory prior to flush.
+Holding entire files in memory instead of streaming.
+
+
+Off-heap/native memory leaks
+============================
+Direct byte buffers (ByteBuffer.allocateDirect), Netty ByteBuf not released.
+JNI libraries leaking native memory.
+
+
+Accidental object retention via closures
+=============================
+Lambdas/inner classes capturing outer large objects (e.g., capturing this when only a small field is needed).
+
+
+Finalizers/cleaners misuse
+
+
+Relying on finalizers/cleaners for resource cleanup (unpredictable; delays reclamation).
+
+
+Mutable keys in hash-based collections
+
+
+Changing fields that participate in hashCode()/equals() after insertion prevents removal → structure grows.
+
+
+Logging frameworks & MDC
+
+
+MDC/thread context not cleared in thread pools; holds onto user/request context indefinitely.
+
+
+Quick prevention tips
+
+Use try-with-resources for I/O/DB.
+Prefer bounded caches (Caffeine/Guava) with size/TTL and proper eviction.
+Always deregister listeners and dispose reactive subscriptions.
+Clear ThreadLocal in finally or use frameworks/utilities that do it.
+Shutdown executors and timers on application stop.
+In web apps, avoid putting heavy data in session/singleton scope.
+For app servers, ensure JDBC drivers/loggers are deregistered on undeploy; avoid static references to webapp classes.
+For Netty/direct buffers, release buffers properly.
+
+How to detect quickly
+
+Take a heap dump and analyze with Eclipse MAT (Leak Suspects report, Dominator Tree).
+Enable GC logs; watch for frequent Full GCs and steadily rising heap.
+Use allocation/retained size views in profilers (YourKit, JProfiler, VisualVM).
+Check thread dumps for runaway executors/timers.
 
 
