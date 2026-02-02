@@ -1,0 +1,182 @@
+
+Out of memory error:
+---------------------
+
+9 types of out of memory error: This can be seen in the error message itself just after the colun
+
+Example: java.lamg.outofmemory: heap.
+
+This is the basic type of out of memory exception It basically occurs when your eden area and heap area saturates.
+
+we forcast the outofmemory exception. by making use of garbage collection behaviour, if the graph is in the form of sawtooth form, if it raises and drops and maintaing
+the zero angle, Then this is of healthy, The graph should be increasing and reducing. if the angle of the memory release is incrementally increasing then this should
+consider as anamoly in the garbage collection. we can forcast this as memory leak and this would lead to the outofmemory consumption.
+
+Causes:
+----------
+due to high traffic
+buggy code.
+
+-> fix the memory leak code.
+-> increase xmx heap size.
+
+what we should use:
+-------------------
+1. Garbage Collection log.
+2. Heap dump.
+
+Tools:
+------
+GC Easy -> For Analysing the logs, It will tell you memory leak objects, 
+Heap Hero,
+
+
+Reason 2:
+-----------
+Out of memory due to GC Overhead limit exceeded. same as the previous elements.
+
+
+Reason 3:
+-----------
+Out of memory error due to Requested array size exceeds VM limit.
+-> We can directly get it from the stak trace.
+
+Fixes:
+1. Fix the code that is requesting that much memory.
+2. Increase the heap size XMX.
+
+Reason 4:
+----------
+Out of memory error due to meta space:
+
+In meta space the class definitions are stored, when we load multiple class files at run time or multiple jars at a time, at a point of time the metaspace
+becomes saturated then the out of memory error occurs.
+
+Simulation:
+-----------
+public class solution{
+public static void main(String[] args){
+ClassPool classpool=ClassPool.getDefault();
+int counter=0;
+while(true){
+String name="Buggy Class";
+classpool.makeClass(name).toClass();
+count++;
+if(count%5000==0){
+System.out.println(count+ "Classes Created");
+}
+}
+}
+}
+
+To Analyse, what are the classes that are causing the outofmemory error we should run the following commands
+
+java -jar appname.jar -verbose:class if they are really needed or not. if it needed, then its ok if not remove that third part jar.
+
+java {App_name} -Xlog:class+load =info:<filename>
+
+GC.Class histogram -> 
+
+Heap -dump: Check the heap dump and use analyzer tools like heap hero to analyze the heap dump and identify the third party app which is loading the classes 
+at run time.
+
+GC Log Analysis.
+
+Causes:
+-----
+1. Creating large number of Dynamic classes(Java Reflection,AOP etc) 
+2. Loading large number of classes at run time by your third party application.
+3. Loading large number of class loaders.
+
+Solution:
+--------
+Fix Memory leaks 
+Increase meta space.
+increase -XX:+MetaspaceSize and -XX:+MaxMetaspaceSize
+
+Reason 5:Permgen:
+---------
+Its replace by metaspace out of the heap. 
+1. Before the java 8, the permgen was present in the heap, we used to store the class definition in the permgen. 
+2. PermGen space is prone to causing the famous OutOfMemoryError due to its fixed size and inefficient garbage collection. 
+This error often occurs when class loaders are not properly garbage collected, leading to memory leaks. This is particularly 
+common in development environments where new class loaders are frequently created.
+3. Starting with Java 8, PermGen was replaced by Metaspace, which brought significant improvements. Unlike PermGen, Metaspace uses native memory and can grow automatically by default, reducing the likelihood of OutOfMemoryError. Metaspace also introduces new flags for tuning memory, such as MetaspaceSize and MaxMetaspaceSize.
+
+Fix:
+----
+Same as metaspace ooe.
+
+Reason 6: Unable to create new native threads:
+--------------------------------------
+1. When your application has no memory to create to the threads anymore, then this error is thrown
+
+a. For Analyzing the thread dump Fast Thread tool.
+b. It will give you the complete summary like what and all the threads that are runable or in timed waiting state. 
+c. Groups the threads with identical stack trace and groups them under 1 category.
+
+Causes:
+1. Threads are leaking, fpr every call a new thread is being created.
+2. When your thread count goes behind the kernel default thread limit.
+
+Troubleshooting:
+-----------------
+1. Make use of thread dump. Identify the thread leaks (Creating a new thread for every call and not terminating).
+2. Make use of the tools like Fast Heap, then analyse it using this tools like Fast Thread. Example if your threads are using same
+
+Fixes:
+-----
+1.Fix the code where it causing the thread leaks. 
+2. Increase the thread limit of the OS kernel.
+
+
+Reason 7: Direct Buffer Memory:
+------------------------------
+1. When we do the direct file io operation those files will be stored here in the Buffer io area.
+2. When you have high i/0 performing requirement and huge buffers are allocated to that task but never released then those it may get saturated and throw this error.
+3. In Stack trace itself it prints the message.
+
+Causes:
+-----
+1. Increase in the direct buffer usage
+  a. Moving from spring framework rest template to the webclient/
+  b. java.nio package
+  c. Some JDBC Drivers.
+
+Fixes:
+------
+1. Fix your memory leakes
+2. Increase the MaxDirectMemorySize
+
+Trouble shootinh:
+--------------
+Just monitor the application log there we can find the log details.
+
+
+Reason 8: Kill process or sacrifice child:
+---------------------------------------
+It occurs when there is not that much RAM capacity, then the Kernel will think that the JVM is requesting much memory, it will terminate your JVM.
+-> It will be stored in the kernel logs:.
+Causes:
+1. LAck of RAM capacity.
+2. High Memory utilisation by other process in the environment.
+3. Memory leak in the code.
+
+Solution:
+---------
+1. Kill other processes.
+2. Increase RAM capacity.
+3. Fix Memory leak in the code.
+
+Artifact:
+Natice memory tracking.
+Heap dump
+GC Log
+dmesg
+
+Tools :
+-----
+1. Eclipse MAT
+2. Heap Hero.
+
+
