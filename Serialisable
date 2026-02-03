@@ -1,0 +1,9 @@
+Serialisation, Deserialisation, externalisation:
+
+Externalisation internally extends the serialisable interface . This gives us the finer control over the serialisation process. 
+Using serialisation, we dont have the control except using the transient keyword. But by making use of externalisable, we can have the complete control/
+
+If we implement the externalisable interface, we should implement the methods writeExternal(ObjectOuput out) and readExternal(ObjectInput in).
+-> If we want to serialise we should implement the writeExternal method and provide your custom implementation.
+->If we want to deserialise we can make use of readExternal and provide the implementation.
+-> These two methods may throw the i/0 Exception if there is any error in the write operation and may throw the classnotfound exception if the class is not defined.
