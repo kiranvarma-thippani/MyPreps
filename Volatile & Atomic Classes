@@ -1,0 +1,107 @@
+Volatile keyword is used ensure the thread visibility among the threads in a multi threaded environment. Every Thread will be associated with the local thread cache, this cache will load the data from the main memory and the thread will be using this data for the tasks.
+
+This is the core design just to improve the performance. Instead of taking the value from the main memory it makes use of thread cache and proceed with the task.
+
+But in case of multithreading environment, if multiple threads perform changes on the same resource, then one of the thread will store the stale date in its thread cache and the staled data will be used for the further tasks.
+
+In order to get rid of this, volatile keyword is used. It will enforce the threads to see it from the main memory for every operation.
+it prevents caching and instruction reordering but it does not guarantee atomicity.
+
+class SharedObj {
+    private volatile boolean flag = false;
+
+    public void setFlagTrue() {
+        System.out.println("Writer thread made the flag true !");
+        flag = true;
+    }
+
+    public void printIfFlagTrue() {
+        while (!flag) {
+            // do nothing
+        }
+        System.out.println("Flag is true !");
+    }
+}
+
+public class VolatileExample {
+    public static void main(String[] args) {
+        SharedObj sharedObj = new SharedObj();
+
+        Thread writerThread = new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            sharedObj.setFlagTrue();
+        });
+
+        Thread readerThread = new Thread(() -> sharedObj.printIfFlagTrue());
+
+        writerThread.start();
+        readerThread.start();
+    }
+}
+Atomic Classes:
+----------------
+1. Atomic classes are part of java.util.concurrent.atomic package.
+They provide lock‑free, thread‑safe operations on single variables.
+Simply:
+👉 They allow multiple threads to safely update a variable without using synchronized.
+2. Why do we need it,Even though we have the synchronised keyword.
+ Because using synchronized is slow:
+ It blocks threads
+ It creates contention
+ It hurts performance in multi‑threaded systems.
+3. CAS is a CPU-level instruction.
+Atomic classes do this:
+
+Check if the variable contains an expected value
+If yes → update it
+If not → retry
+
+All this happens without locking.
+Example:
+---------
+
+public class VolatileCounter {
+    private AtomicInteger counter = new AtomicInteger(0);
+
+    public void increment() {
+        counter.incrementAndGet();
+    }
+
+    public int getCounter() {
+        return counter.get();
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        VolatileCounter vc = new VolatileCounter();
+        Thread t1 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) {
+                vc.increment();
+            }
+        });
+        Thread t2 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) {
+                vc.increment();
+            }
+        });
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+        System.out.println(vc.getCounter());
+    }
+
+}
+
+when to use Atomic Classes:
+------------------------
+1. When you want to update the single variable.
+2. When you wnat to replace the synchronised keyword for such scenarios. We make use of Atomic Classes.
+ABA problem is when a value changes from A → B → A, and CAS can't detect this change because it only checks the value, not the history. Java solves it using AtomicStampedReference and AtomicMarkableReference.
+
+
+
+
