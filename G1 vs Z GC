@@ -1,4 +1,154 @@
- 1. Purpose
+1️⃣ Heap is divided into many small regions
+
+Instead of one big Young and one big Old area,
+G1GC breaks the heap into hundreds of small regions (1MB–32MB each).
+Each region can act as:
+
+Young region
+Old region
+Humongous region (very large objects)
+
+
+
+👉 This allows G1 to pick small areas to clean instead of freezing the whole heap.
+
+2️⃣ Young GC happens first
+Young GC = cleaning the new/temporary objects.
+G1GC does:
+
+Eden → Survivor → Old promotion
+Dead objects are removed
+Live objects are copied to Survivor/Old regions
+
+This process is parallel and very fast.
+
+3️⃣ G1 finds which regions have the MOST garbage
+This is the main feature.
+G1 = Garbage First
+
+G1GC scans all regions
+Estimates which ones contain the most garbage
+Prepares a list → “These are the dirtiest regions”
+
+👉 It focuses only on areas that give the highest garbage cleanup benefit.
+
+4️⃣ Mixed GC — cleaning both Young + Old regions
+After some time, G1GC begins Mixed GC:
+It cleans:
+
+Eden regions
+Survivor regions
+Some Old regions (not all)
+
+It chooses only old regions that are most garbage-filled.
+👉 This avoids long stop-the-world Full GCs.
+
+5️⃣ Compaction happens while copying
+Unlike older collectors, G1GC compacts memory automatically as it copies objects.
+When live objects are moved:
+
+They are placed together (no holes)
+The region becomes empty and reusable
+
+👉 This prevents fragmentation without long pauses.
+
+🧠 What about Full GC?
+G1GC tries very hard to avoid Full GC.
+But a Full GC may happen if:
+
+Humongous objects are too many
+Not enough free regions
+Promotion failures happen
+Tuning/memory too small
+
+In Full GC, JVM pauses everything and does a classic mark-sweep-compact, but it’s rare.
+
+🎯 Super Simple Summary
+Here’s G1GC in 5 easy lines:
+
+Breaks heap into many small regions
+Cleans young regions normally
+Finds regions with maximum garbage
+Cleans only those regions (Young + Old) → Mixed GC
+Copies + compacts objects while cleaning.
+
+ZGC:
+====
+ZGC is a scalable, low‑latency garbage collector introduced in Java 11 and improved in later versions.
+Its main goal:
+👉 Pause times always remain below 10 milliseconds, even with very large heaps.
+
+GC (Z Garbage Collector) is a very low‑latency garbage collector that keeps GC pauses always under 1–2 milliseconds, even if your heap is huge (GBs to TBs).
+✔ It does almost all garbage collection while your application is running
+✔ It compacts memory (moves objects) without stopping the application
+✔ It uses smart tricks like colored pointers and load barriers.
+
+STEP 1: Heap is divided into regions
+ZGC divides the heap into many small parts called regions.
+Think of the heap as many small boxes instead of one big block.
+This makes it easy to clean and move objects in small pieces.
+
+STEP 2: ZGC uses colored pointers
+Every object reference (pointer) contains extra bits.
+These extra bits tell ZGC:
+
+Whether the object is marked
+Whether it is being moved
+Whether the pointer is old and needs fixing
+
+This is revolutionary because ZGC doesn’t have to stop your program to check states.
+
+STEP 3: Load Barriers — the most important part
+Whenever your program reads an object, ZGC intercepts that read:
+👉 It checks whether the object was moved
+👉 If moved, ZGC silently fixes the pointer to point to the new location
+👉 And your program continues normally
+This allows ZGC to move objects without stopping the application.
+
+STEP 4: ZGC Cycle Phases (Very Easy)
+Phase A: Mark Start (tiny pause <1ms)
+ZGC pauses all threads just long enough to see what objects are reachable from roots.
+This pause is extremely small.
+
+Phase B: Concurrent Marking
+ZGC now scans the heap to find all reachable objects.
+🔹 Your application continues running
+🔹 ZGC continues marking
+🔹 Load barriers fix pointers when reads happen
+So this phase is fully concurrent.
+
+Phase C: Mark End (tiny pause <1ms)
+A very small pause to finalize marking.
+
+Phase D: Select which regions to relocate
+ZGC finds:
+
+Which regions are mostly empty
+Which ones are fragmented
+Which objects should be moved
+
+Still no pause.
+
+Phase E: Concurrent Relocation (Compaction)
+This is the killer feature.
+ZGC moves objects to new locations while:
+
+Your threads are running
+Your code is accessing them
+Load barriers keep fixing pointers
+
+So compaction becomes completely concurrent.
+No other GC compacts this way.
+
+Phase F: Concurrent Reset
+ZGC clears metadata and prepares for next cycle.
+Still concurrent.
+
+
+
+
+
+1. Purpose
 
 G1 GC: Designed for low pause times while still achieving good throughput. Ideal for large heaps (multi-GB) but not extreme sizes.
 ZGC: Designed for ultra-low pause times (sub-millisecond) even with very large heaps (up to terabytes).
