@@ -1,0 +1,108 @@
+Future :
+
+Future object is the object that stores the output and status of the asynchronous computation that may not give the response immediately.
+
+-> Future object is used to get the status and answer of the asynchronous computation.
+-> Using the Future object, we can make use of different methods in order to perform different operations ontop of future object.
+-> cancel(boolean ifrunning)-> cancels the asynchronous computation. 
+Here the boolean value is true, then the cancel operattion will interupt the asynchronous communication and that thread get interupted only if it responds.
+If it is false, then it does not interupt the methods which are already running. But it will cancels the asynchronous computation which is not yet started.
+-> isCancelled() return true, if the cancel method is called, no matter what the thread is interupted or not.
+No callbacks: You can’t attach a “when complete, do X” without blocking or polling.
+-> It wraps the exceptions in the ExecutionException exception in future.get() call only.
+Future States
+===========================
+1. Running
+2. Completed
+3. Failed (ExecutionException)
+4. Cancelled
+
+DrawBacks of Future Object:
+============================
+Manual composition: Combining results from multiple futures is clumsy.
+Error handling is via checked exceptions (ExecutionException, InterruptedException) and requires boilerplate.
+No chaining: You can’t easily say “on result of A, start B, then C”.
+
+In order to acheive all these things make use of completable future.
+
+CompletableFuture:
+=================
+You want non-blocking callbacks (thenApply, thenCompose, thenAccept).
+You need pipelines, compositions, parallel joins (allOf, anyOf).
+Better exception handling (exceptionally, handle).
+Optional custom executors and async stages (supplyAsync, runAsync).
+
+=================================================================================================================
+Definition: A handle to an async computation; provides get, cancel, status checks.
+Blocking: get() blocks; use timeouts to avoid indefinite waits.
+Exceptions: get() wraps task failures in ExecutionException.
+Cancellation: Works only if task checks interrupts; cancel(true) attempts to interrupt.
+Multiple tasks: Use invokeAll for batch submission and collective completion.
+Limitations: No callbacks/composition → prefer CompletableFuture for advanced workflows.
+Thread safety: Future methods are thread-safe; the task must manage its own concurrency and interrupt handling.
+=================================================================================================================
+
+ExecutorFramework:
+
+1. Executor:
+Root interface in the executor framework.
+-> Simplest abstract for execution of task
+Key Points:
+----------
+1. No Return Type
+2. No Lifecycle maintainance
+3. No Exception Handling.
+4. It just executes a simple runnable.
+5. No shutdown.
+6. No Future Object.
+7. It contains only 1 abstract method that is execute().
+
+When to use Executor?
+1. Simply fire and forget Applications.
+2. Rarely used in Real time Applications.
+
+
+2. ExecutorService:
+------------------
+1. ExecutorService extends the Executor interface. It provides various methods 
+2. Task lifecycle - shutdown, shutdownnow, awaittermination.
+3. Result handling (Future Objecy)
+4. Shutdown control 
+5. Batch execution.(Invoke All, Invoke Any-> if any of the runnable or callable succeeds, then it returns the results).
+
+
+Methods:
+-------
+1.submit(Runnable runnable), submit(Callable callable).
+2. shutdown(), shutdownNow(), awaitTermination().
+3. Future object-> cancel(boolean), isCancelled, get()-status, result, exception wrapped in ExecutionException, isDone().
+
+
+ScheduledExecutorService:
+--------------------------
+If you want to execute a task at regular intervals or with a fixed delay asynchronously, we go with scheduled executorservice.
+ScheduledExecutorService scheduler =ExecutorService.new ScheduleThreadPool(1);
+1. scheduler.schedule(()->System.out.println("Hello after 5 seconds delay"),5, TimeUnits.Seconds);
+
+scheduler.shutdown()-> shuts down at 5 seconds delay..
+
+2. scheduler.scheduleAtFixRate(()-> System.out.println("Task Executed after 5 second delay"),5,6,TimeUnits.SECONDS); 5==initial delay, 6=fixed period irrespective of completion of the tasks. these will be overlapping with the previous tasks.
+
+These will be running continuosly, hence we use scheduler.scheudle((()->scheduler.shutdown),20, TimeUnit.SECONDS)-->Used to stop the tasks submittig periodically again.
+
+3. scheduler.scheduleAtFixedDelay: At a proper delay after the completion of the previous task, it will be start executinh at the mentioned delay.
+
+ScheduleFuture<?> scheduleFuture=scheduler.scheduleWithFixedDelay((()-> some task), initial delay, fixeddelay, TimeUnit.SECONDS)
+
+================================
+CachedThreadPool:
+----------------
+
+1. This is will dynamically will generate the threads as per the threads. and removes the idle thread from the thread pool.
+2. Use when load variable and short live tasks.
+3. Dont use cachedthreadpool for long tasks which consumes all your system resources and may create out of memory exception due to threads 
+
+
+
+ 
+
