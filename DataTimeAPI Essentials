@@ -1,0 +1,29 @@
+Date Class is the class that we use in day to day life prior to java 8. The drawbacks of the Data class is 
+-> mutable
+-> non thread safe
+-> bad design
+-> confusig
+
+LocalDate class provides you clean, immutable and thread safe dates instances by which you can work with dates comfortable.
+if you want only dates, then go with LocalDate=LocalDate.now();
+if you want only time, then go with LocalTime lt=LocalTime.now();
+if you want both date and time, then go with LocalDateTime ldt=LocalDateTime.now();
+if you want both the time stamps then you can go with Instant instant=Intant.now() which wil give you time stamps.
+if you want to format the Date, we have DateTimeFormatter
+LocalDate date=LocalDate.now();//
+LocalDate start=LocalDate.of(2024,1,1);
+LocalDate end=LocalDate.now();
+Period p=Period.between(start,end);
+LocalDate date=LocalDate.now();
+DateTimeFormatter dtf=DateTimeFormatter.ofPattern("dd-MM-yyyy");
+String str=date.format(dtf);
+String str="04-12-2025";
+LocalDate dt=LocalDate.parse(s,dtf)
+LocalDate ldt=LocalDate.now();
+
+It provides you the immutable, Thread safe, cleanly designed Date Time API, Clear separations between the 
+date, time and zoned time.
+
+
+
+
