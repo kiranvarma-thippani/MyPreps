@@ -18,5 +18,24 @@ String name=in.readName();
 
 }
 1. Serilisation has bad performance and Externalisation having better performance.
-2. Serialisation require no no arg constructor whereas the externalisation require public no arg constructor(invalid constructor(.
-3. 
+2. Serialisation require no no arg constructor whereas the externalisation require public no arg constructor(invalidclassException.
+3. Hard to analyse and modify the class structure because one change fcan break the serialisation process. Easier to analyse and modify as it is completely under our control.
+4. Transient key word plays a key role in the Serialisable based serialisation and that does not play any role in externalisable.
+5. Partial object saving is not possible in serializable and partial object saving is present in the Externalisable base serialisation.
+
+
+-> Deserialise vulberability is a severe ssecurity vulnerability where a malicious user tries to insert the tampered deserialise objec and comprimise the data.
+-> Preventive measures:
+1. Until it is used, dont use the serialisability in your project.
+2. Do not accept serialised objects from the untrusted sources.
+3. keep your .ser file in a secure place and restrict the access to only authorised person.
+4. Dont share the passwords over the serialisable object which causes severe vulnerability.
+
+Inheriatance rules applies with serialisation, Deserialisation of child or parent class.
+1. If the parent class is serialisable, then the child class is also serialisable.
+2. If a super class can not be serialisable, then there is a chance that the child class is still serialisable by implementing the serialisable interface in this case during
+the deserialisation, as the parent class is not serializing right?the no args constructor of the parent class will be run to instantiate its state then the child;s properties
+will be populated from the stream.
+3. if both parent and childs classes are not serialisable then it throws NotSerialisableException.
+
+
