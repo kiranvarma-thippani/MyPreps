@@ -7,3 +7,16 @@ If we implement the externalisable interface, we should implement the methods wr
 -> If we want to serialise we should implement the writeExternal method and provide your custom implementation.
 ->If we want to deserialise we can make use of readExternal and provide the implementation.
 -> These two methods may throw the i/0 Exception if there is any error in the write operation and may throw the classnotfound exception if the class is not defined.
+
+public void writeObject(ObjectOuptut out){
+out.writeInt(id);
+out.writeBytes(name);
+}
+public void readObject(ObjectInput in){
+int id=in.readInt();
+String name=in.readName();
+
+}
+1. Serilisation has bad performance and Externalisation having better performance.
+2. Serialisation require no no arg constructor whereas the externalisation require public no arg constructor(invalid constructor(.
+3. 
