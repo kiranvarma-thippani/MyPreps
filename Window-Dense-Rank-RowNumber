@@ -1,0 +1,10 @@
+SQLs:
+----
+Window Function
+1. Certain functions like finding out the second highest salary for each department is not possible and also all the colums are not viewed using the group by
+hence, we make use of the window function.
+2. Window function we make use of the functions like over() -> to create the window. row_number() for giving each row a number, partition by divides big window into individual
+windows making use of partitionby.
+3. rank() is used to rank the rows, for suppose if we partition by department and sort based on the salary, if there are duplicate salaries then row number will be unique,
+rank will assign the number based on the ranke i.e.( row number salary1=salary2 the salary -1, salary-2, rank-> salary1=salary2 the salary1row =1, salary2row=1, but skips number 2
+and gives number 3. Dense rank will solve this problem.
