@@ -1,0 +1,73 @@
+MySQL ALTER TABLE - Complete Commands
+
+1. Add a column
+ALTER TABLE employees ADD age INT;
+
+2. Add multiple columns
+ALTER TABLE employees ADD COLUMN salary DECIMAL(10,2), ADD COLUMN city VARCHAR(50);
+
+3. Drop a column
+ALTER TABLE employees DROP COLUMN age;
+
+4. Rename a column
+ALTER TABLE employees RENAME COLUMN name TO full_name;
+
+5. Modify datatype
+ALTER TABLE employees MODIFY salary DECIMAL(12,2);
+
+6. Add NOT NULL
+ALTER TABLE employees MODIFY city VARCHAR(50) NOT NULL;
+
+7. Remove NOT NULL
+ALTER TABLE employees MODIFY city VARCHAR(50) NULL;
+
+8. Add DEFAULT
+ALTER TABLE employees ALTER city SET DEFAULT 'Hyderabad';
+
+9. Drop DEFAULT
+ALTER TABLE employees ALTER city DROP DEFAULT;
+
+10. Rename table
+ALTER TABLE employees RENAME TO employee_details;
+
+11. Add PRIMARY KEY
+ALTER TABLE employees ADD PRIMARY KEY (id);
+
+12. Drop PRIMARY KEY
+ALTER TABLE employees DROP PRIMARY KEY;
+
+13. Add UNIQUE
+ALTER TABLE employees ADD CONSTRAINT unique_email UNIQUE(email);
+
+14. Drop UNIQUE
+ALTER TABLE employees DROP INDEX unique_email;
+
+15. Add FOREIGN KEY
+ALTER TABLE orders ADD CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES customers(id);
+
+16. Drop FOREIGN KEY
+ALTER TABLE orders DROP FOREIGN KEY fk_customer;
+
+17. Add CHECK
+ALTER TABLE employees ADD CONSTRAINT chk_salary CHECK (salary > 0);
+
+18. Drop CHECK
+ALTER TABLE employees DROP CHECK chk_salary;
+
+19. Add INDEX
+ALTER TABLE employees ADD INDEX idx_email (email);
+
+20. Drop INDEX
+ALTER TABLE employees DROP INDEX idx_email;
+
+21. Add AUTO_INCREMENT
+ALTER TABLE employees MODIFY id INT AUTO_INCREMENT;
+
+22. Change column order (After)
+ALTER TABLE employees MODIFY city VARCHAR(50) AFTER name;
+
+23. Move column to FIRST
+ALTER TABLE employees MODIFY id INT FIRST;
+
+24. Drop PRIMARY KEY + AUTO_INCREMENT
+ALTER TABLE employees MODIFY id INT, DROP PRIMARY KEY;
