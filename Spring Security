@@ -86,14 +86,9 @@ This ensures that the request came from the legitimate site and not from a malic
 
 
 @EnableWebSecurity
-This annotation is placed on a @Configuration class to enable Spring Security’s web security support.
-
-
-What it does:
-
-Activates Spring Security’s web security configuration.
-Registers the SpringSecurityFilterChain, which intercepts HTTP requests and applies security rules.
-Allows you to customize the default security behavior by defining a SecurityFilterChain bean.
+Enables Web Security: It activates the core web-based security features, allowing the configuration of authentication and authorization for incoming HTTP requests.
+Configures the Security Filter Chain: It sets up the security filter chain that filters all web requests, applying security rules defined in the configuration.
+URL Access Control: It provides a mechanism (typically via HttpSecurity in a configuration bean) to define URL-based access rules, such as requiring specific roles to access certain paths (e.g., /admin/**), configuring login/logout behaviors, and managing sessions.
 
 ===================================================================================
 disabling of csrf tokens in your web application:
@@ -386,6 +381,487 @@ If authentication succeeds → calls successfulAuthentication().
 If authentication fails → calls unsuccessfulAuthentication().
 
 
+Authentication:
+===============
+1. Authentication is the process of the verifying who you are?
+2. It ensure that the user is legitimate or not.
 
-26809
+Authorisation:
+-------------
+1, Its all about that what a user can do after the authentication.
+2. He can only able to do the things to which he have the access to.
+
+
+-> Add spring starter security 
+
+Filter chain-> part of servlet api, 
+
+Deligatinng Filter proxy:
+
+Servlet container (Tomcat) loads filters using web.xml / filter declarations
+
+These filters are not created by Spring
+They are created before Spring context is even ready
+So Tomcat cannot access beans from the Spring ApplicationContext
+
+2️⃣ Spring Security filter chain (springSecurityFilterChain) is a Spring bean
+
+It lives inside the Spring container
+Tomcat cannot see it directly
+
+3️⃣ So Spring uses a "bridge filter": DelegatingFilterProxy
+
+This filter is created by Tomcat
+But it contains only a delegation mechanism
+It looks inside Spring context for a bean name (usually "springSecurityFilterChain")
+Then forwards all servlet requests to that bean.
+
+Deligating filter proxy contains FilterchainProxy contains security filter chain -> chain of filters. 
+
+Authentication Provider examples:
+1. Spring genrated username and password.
+2. In Memory/Database, OAuth2, LDAP
+
+Spring provides different authentication providers to customise your authentication process. Based on your desire, you can choose them for this
+
+We have a authentication provider, which is an interface implemented by provider manager,. This provider manager will select the authentication provider based on
+the type of authentication whether it of oauth or formlogin etc whatever it might be. Based on the type of format, the provider manager will choose the authentication
+provider by iterating the providers and invoking the supports method present in it. once it finds the appropriate authentication provider and Authenticate method will be invoked. 
+
+We have used for login form for authentication. That means our system enforces the user to enter the username and password which is intercepted usernamepassword authentication filter. Authentication object with username and password will be created by making use of the usernamepasswordAuthenticationtoken object which extracts
+the username and password from the incoming request.
+
+We pass this authentication object into the method of the AuthenticationProvider.authenticate(authentication). AuthenticationProvider will deligate the authentication
+object to provider manager which iterates through all the available Authentication providers and executes supports() methods on each authenticationprovider and 
+whatever the authentication provider supports the authentication, it is choosen. In our case it daoauthentication provider which makes use of UserDetailService which
+loads the userdetails by making use of loadByUsername(String username). 
+
+UserDetailService-> InMemoryUserDetailsManager and JDBCUserDetailsManager.
+
+We make use of the passcode encoders like bcrypt encoder which encodes your password preventing the exposing the raw password.
+
+-> Once the authentication completes, an Authentication object is created, and stored in securitycontext() in order to make the other parts of the spring boot 
+application access the detaails of your authentication(Principle object) object. getContexy()
+
+SecurityContextHolderFilte will hold you thesecurity context in ehich the user authentication object that means username, password, authorities will be stored.
+
+-> SecurityContextHolderFilter creates an empty SecurityContext at the start of a request and clears it at the end, ensuring the correct logged‑in user is stored only for that request.
+
+-> ExceptionTranslatorFilter: This is used to catch the exceptions thrown in your application security layer and gives a meaning message to the client.
+
+
+How Spring Security knows whether the account is expired or locked?
+✔️ Because UserDetails (your user object) contains flags for that.
+Spring Security calls these four methods:
+Javaboolean isAccountNonExpired();boolean isAccountNonLocked();boolean isCredentialsNonExpired();boolean isEnabled();Show more lines
+If ANY of these return false, Spring Security blocks authentication.
+
+⭐ Where does it get these values from?
+From your database, through your UserDetailsService.
+Example:
+Your User table might have:
+is_account_locked     → 0 or 1
+is_account_expired    → 0 or 1
+is_credentials_expired→ 0 or 1
+is_enabled            → 0 or 1
+
+Your UserDetailsService maps this to a Spring UserDetails object:
+Javareturn org.springframework.security.core.userdetails.User        .withUsername(u.getUsername())        .password(u.getPassword())        .authorities(authorities)        .accountExpired(u.isAccountExpired())        .accountLocked(u.isAccountLocked())        .credentialsExpired(u.isCredentialsExpired())        .disabled(!u.isEnabled())        .build();Show more lines
+(Spring’s User builder actually uses the "opposite" flag internally → that’s why it uses accountExpired(boolean expired) etc.)
+
+⭐ What happens during login (Authentication flow)
+
+User enters username & password
+DaoAuthenticationProvider calls your loadUserByUsername(username)
+Spring receives a UserDetails object that contains:
+
+username
+encrypted password
+authorities
+account flags (expired, locked, disabled etc.)
+
+
+DaoAuthenticationProvider checks these flags:
+
+If the account is locked → throw LockedException
+If the account is expired → throw AccountExpiredException
+If credentials expired → throw CredentialsExpiredException
+If disabled → throw DisabledException
+
+
+Authentication fails before checking the password.
+
+===========================================
+
+BCrypt Password encoder:
+----------------------
+if you store the password in the form of plain text, then any one would get tje access the passwords of yours if he/she is have the db access which is not safe.
+-> To Encode the password, we have two ways:
+1. Encryption, decryption.
+2. Hashinh.
+Encryption and decryption is done by making use of a key, if some one steals a key, then it would be a problem.
+
+Hashing will encode your password into the string of characters and which is irreversable, you cannot recreate the passwords from the hash.
+1. One such password encoder is bcryptpassword encoder.
+2. It hashes your password, its slow by design to get rid of the brute force approach.
+3. It adds the salt to your password, which is a unique value added to the password, ensuring that if two users having same password, their hashes will be different.
+This salt is typically 128 bits long and is encode in Base64. It prevents from the raibow table attack.
+4. How hash works is, you will encode the password when you register and this hash will be stored in the database. While authenticating you enter the password,
+again undergoes hashing generating the same hash and these hashes were compared. if they are equal then we conclude the password is correct. else not.
+
+
+========================================
+Cross Origin:
+---------
+@CrossOrigin is a Spring annotation used to enable Cross-Origin Resource Sharing (CORS) for a specific controller or endpoint.
+1. It allows your API to accept requests from a different domain/port.
+2. Basically, we can enable this cross origin by making use of different ways like,
+1. Making use of @Cross)rigin("httpLink") on class and mentioning the http methods.
+
+@CrossOrigin(
+    origins = {"http://localhost:3000", "https://myapp.com"},
+    methods = {RequestMethod.GET, RequestMethod.POST},
+    allowedHeaders = "*"
+)
+2. Making use of Configuration file:
+
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable()) // enable/adjust based on your app
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/public/**").permitAll()
+                .anyRequest().authenticated()
+            );
+        return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration cfg = new CorsConfiguration();
+        cfg.setAllowedOrigins(List.of(
+                "http://localhost:3000",
+                "https://app.mycompany.com"
+        ));
+        cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        cfg.setAllowedHeaders(List.of("*"));
+        cfg.setExposedHeaders(List.of("Authorization", "Location"));
+        cfg.setAllowCredentials(true);
+        cfg.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/**", cfg); // apply to specific path
+        return source;
+		
+    }
+}
+
+setExposedHeaders(...)
+Makes selected headers visible to frontend JS
+
+setAllowCredentials(true)
+Allows cookies/tokens to be sent across domains
+
+setMaxAge(3600)
+Caches preflight CORS result for 1 
+
+A preflight request is a request that the browser sends before the actual API call, just to ask permission from the server.
+
+=========================================================================================================
+JWT:
+
+A JWT (JSON Web Token) is an open, industry-standard (RFC 7519) compact, URL-safe method for securely transmitting information between parties as a JSON object. It is primarily used for stateless authentication and authorization, allowing servers to verify user identity without storing session data. It consists of three base64url-encoded parts: Header, Payload, and Signature. 
+
+JWT consists of three parts namely:
+
+1. Header
+2. Payload
+3. Signature.
+
+Header-> JWT type and Algorithm used for signing.
+PayLoad-> sub(username to identify the user), roles(Admin/user), permissions, iat, exp,custom claims like permisions, accountstatus or whatever it might be.
+Signature-Ensure the token is not modified and not tampered.
+
+HMACSHA256(
+  base64(header) + "." + base64(payload),
+  secret_key
+)
+
+What JWT DOES NOT store
+Very important for interviews:
+❌ Passwords
+❌ Database credentials
+❌ Secrets
+❌ Refresh tokens
+❌ Bank/financial info
+❌ Personal sensitive info (Aadhaar, PAN, etc.)
+
+
+Client → username/password → /login
+[2] Server validates credentials
+[3] Server creates JWT
+[4] Server → returns JWT → Client
+[5] Client sends JWT in Authorization header
+[6] Server validates JWT signature & expiry
+[7] Server extracts user roles from JWT
+[8] Spring Security checks access rules
+[9] If authorized → allow request.
+
+Step 1: User sends login request
+Client sends username & password.
+
+POST /login
+{
+  "username": "madhu",
+  "password": "12345"
+}
+
+Step 2: Server verifies credentials
+Spring Security checks:
+
+Is username correct?
+Is password valid?
+Is account active/locked?
+
+If YES → go to next step.
+
+Step 3: Server generates JWT
+Inside the JWT, server stores:
+
+{
+  "sub": "madhu",
+  "userId": 101,
+  "role": "ADMIN",
+  "iat": 1739115574,
+  "exp": 1739120000
+}
+
+This payload is signed using:
+
+HMACSHA256(payload, secret_key)
+
+Step 4: Server returns JWT to client:
+HTTP 200 OK
+Authorization: Bearer <jwt-token>
+
+Client stores token in:
+
+localStorage
+sessionStorage
+cookies
+
+PART 2: AUTHORIZATION FLOW
+
+Step 5: Client sends JWT with each request
+Client wants /admin/dashboard
+So it sends:
+GET /admin/dashboard
+Authorization: Bearer eyJhbGciOiJIUzI1...
+
+Step 6: Server extracts JWT from header
+Spring Security gets token from:
+
+Authorization: Bearer <token>
+
+It does not check DB — completely stateless.
+
+Step 7: Server validates JWT
+Server checks:
+✔️ Signature valid?
+✔️ Token not expired?
+✔️ Token not tampered?
+✔️ Algorithm correct?
+
+Step 8: Server creates “Authentication Object”
+Spring Security reconstructs user identity:
+
+User: madhu
+Roles: ADMIN
+Permissions: ["READ", "WRITE"]
+
+These are injected into SecurityContext.
+Now user is authorized
+
+Step 9: Authorization decision
+If endpoint requires:
+hasRole("ADMIN")
+And user has ADMIN → access allowed
+Else → 403 Forbidden 
+
+
+===========================
+What is digital signature:
+
+-> Digital signature ensures the integrity and authenticity of a message or document in digital communication.
+
+Header and payload are separately Base64URL encoded. Then the encoded header + ‘.’ + encoded payload is input to the signing algorithm (like HS256). The server applies HMAC‑SHA256 with its secret key to generate the signature, Base64URL-encodes it, and attaches it as the third part. Final JWT = header.payload.signature.”
+
+While validating, it will check the signature by making use of <header>.<payload> and secret key() if there is any mismatch it rejects.
+=======================
+JWT process;
+<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.11.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.11.5</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>0.11.5</version>
+			<scope>compile</scope>
+		</dependency>
+		
+Must Add these dependancies in your pom.xml
+
+1-> Defines the methods, like:
+✔ Jwts.builder()
+✔ Jwts.parserBuilder()
+✔ JwtParser
+✔ Claims
+✔ SignatureAlgorithm
+✔ Token creation/validation API methods
+
+2️. jjwt-impl → Internal implementation (engine)
+What it contains?
+✔ Actual JWT signing logic
+✔ Encryption & hash algorithm implementation
+✔ Token parsing/validation engine
+✔ Claims processing
+✔ Header/payload generation
+
+3️. jjwt-jackson → JSON Serializer/Deserializer
+JWT lo payload JSON form lo untundi.
+Ee module responsibility:
+✔ Convert Claims → JSON.
+✔ Convert JSON → Claims.
+✔ Add Jackson support (default is Jackson).
+
+
+Claimes:
+
+Claims = User data inside the JWT token.
+Example:
+
+username
+roles
+token expiry
+created time
+custom information
+
+==================================
+Authorisation:
+----------------
+Roles and Permissions:
+These ensure that only user can do the things that he is authorised to do.
+-> Each user will have a role in your system.
+-> Each role will be having one or more permission associated with it. Based on these permissions, a user is authorised to perform an action.
+-> Eache role having a prefix of 'Role_'+username.
+At the end of the security filter chain you will be having authorisation filter. This Authorization filter will be deligating your request to the authorization manager,
+Authorization Manager consists of the method called check().
+Each Authorization Manager will be implemented by few class.
+1. RequestMatcherDelegatingAuthorizationManager(When we use 40
+2. PreAuthorize, Post Authorize
+=========================================================================================
+public class Users implements UserDetails {
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.name()));
+
+        Set<SimpleGrantedAuthority> permissionAuthorities =
+                role.getPermissions()
+                    .stream()
+                    .map(permissions -> new SimpleGrantedAuthority(permissions.name()))
+                    .collect(Collectors.toSet());
+
+        authorities.addAll(permissionAuthorities);
+        return authorities;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+In request matcher, we can make use of hasRole(), or hasAuthority() or hasAnyRoles() or hasAnyAuthorities(). 
+In Request matchers, we can also pass HttpMethod.GET, POST, PUT etc. We can make use of these things with permission
+
+Method Level Security:
+-------------------
+1. Using the request matchers to restrict the access to the specific source is tidious process and which is not maintainable, if we change authorisation techniques of 
+other apis. Then it would be a messy thing.
+2. By making use of the method level security, we can easily have finer grained control in the authorisation perspective.
+Three Annotations:
+1. preAuthorise- Methods are intercepted by the sprinG AOP. An Inreceptor named AuthorisationManagerBeforeMethodInterceptor  will intercept the request and delegate to the authorisation
+manager which contains check() method which is implemented by PreAuthorizeAuthorizationManager  which passes the methodsecurityexpresshandler which is expression. 
+This expression is executed, if its successful, then the actual method is invoked.
+2. PostAuthorise- Just like we have the method interceptor in case of preAuthorise, we have method interceptor post the execution of the method called AuthorisationManagerAfterMethodInterceptor. Will deligate the request to
+the postAuthorizeAuthorization Manager, the response passes through the methodsecurityexpresion handler and if the outcome is success the result of the method is return else not.
+In order to make use of these annotations, we use @EnableMethodSecurity on our spring security configuration class.
+
+@PostAuthorize is a Spring Security annotation that runs authorization logic after the method execution.
+Unlike @PreAuthorize, which checks conditions before method execution, @PostAuthorize lets you validate the returned object and decide whether the caller should be allowed to see it.
+It is mainly used in read‑operations where access decisions depend on the returned resource.
+
+Possible Expression:
+@preAuthorise("hasAuthority('WEATHER_READ')or hasRole('Admin')")
+For write/update/delete operations → always use @PreAuthorize/
+
+@postAuthorise("returnObject.username==authentication.name" or hasRole('hr')
+For read-only use postAuthorise.
+Banking app → user fetches account details
+HR portal → employee fetches their profile
+Social media → user fetches their private data
+
+2️⃣ Filtering access to sensitive data after retrieval
+Useful when the method must run (e.g., database call, API call), but the returned data must be restricted.
+Example scenario:
+
+3. Admin service returns user details
+But non‑admin employees should never view salary details
+DB query must run anyway.
+
+Viewing a complaint/ticket
+Must fetch ticket → then decide access based on ticket.assignedTo or createdBy
+
+"@PreFilter is used to filter method input before it reaches the business logic. It is especially useful when 
+a method accepts a list or collection—Spring Security can automatically remove unauthorized items based on expressions. 
+This prevents invalid or unauthorized data from being processed and protects bulk operations, multi‑tenant access, and privilege‑sensitive actions.
+For Example:
+You're building a REST API that allows bulk update or bulk delete.
+User sends:
+
+{
+  "ids": [1,2,3,4,5]
+}
+
+B ut the logged‑in user may only have permission to modify IDs 1 and 4.
+Instead of rejecting the whole request:
+
+@PreFilter(filterObject.owner==authentication.name)
+
+removes unauthorized items
+Your service processes only allowed IDs
+
+@postfilter(filterObject.owner=authentication.name)
+: It will filter the returning collection of objects based on the condition
+
+
+
 
