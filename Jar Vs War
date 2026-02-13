@@ -1,0 +1,15 @@
+Jar:
+-----
+1. Packages Java classes, libraries, and resources into a single archive. Used for standalone apps or reusable libraries.
+2. Extension is .jar.
+3. Jar files consists of compiled .class files, resources and meta-inf/manifest.mf files.
+4. Use cases-Normap spring boot apps are often packaged as jar.
+5. Jar file can be directly making use of the command java -jar myApp.jar.
+
+War:
+-----
+1. War file will be packaging your entire application including jsp, servlets, html, css and static resources as well.
+2. Uses .war extension.
+3. war will be containing all the compiled files, libraries, jsp and  etc in your web.xml in web-inf folder.
+
+
