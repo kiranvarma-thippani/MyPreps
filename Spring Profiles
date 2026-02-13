@@ -11,6 +11,34 @@ appliction-qa.propeties. We can switch to different configuration for the same c
 
 @Profile("dev") is used for the creation of the beans only in specific environment 
 
+-> If You are having multiple app-env.properties then in default app properties if you mention spring.profiles.active=dev then your dev profile will be activated, if ur specified profile is not available 
+tthen it chooses default config. Also if you dont specify the spring.profiles.active it chooses the default app.props.
+
+-> if you inject the environment properties from your app.properties into the application code using @value annotation, if you dont have that variable in any of the propety file it fails at startup.
+
+Command to activate the profile;
+
+java -jar myApp.jar --spring.profiles.active=prod.
+
+-> we can add the profiles in pom.xml using id and giving it a name, calling that profile at run time.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Application.properties and Application.yml:
 ------------------------------------------
 yml file supports the hierarchial structure.
