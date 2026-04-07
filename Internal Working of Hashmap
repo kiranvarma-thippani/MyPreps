@@ -1,0 +1,23 @@
+Hashmap class implements the map interface. It make use of hashing techniques to store, access, search and delete the element
+in O(1) time complexity. Basically we store the data in the form of key value pair in hashmap using put method.
+
+when we insert the data in the form of key value pair, the key will be undergoing the hashing and a hashcode will be generated.
+This hashcode is used in resolving the index in bucket array where the data is to be mapped. After resolving the index, hashmap
+stores the key value pair in the bucket, prior to that hashmap checks whether the key is already present in the bucket, if it is
+present the value is updated. Sometimes different keys generate same hashcode and these goes to the same bucket this condition is 
+said to be hash collision. This Hash collision can be resolved using Linked lIst.
+
+HashMap make use of LinkedList, if there is any hash collision. If there is huge hash collisions, then the linked list size may
+increases to a extent where the lookup becomes worst approximately O(n).
+
+So in order to boost the look up, hashmap replaces the linked list with tree which is called treeification. So that the lookup time
+reduces to o(log n).
+
+In the retreieval process, we retrieve the value using get method and by passing key into it. The key again undergoes the hashinh
+hashcode generates, bucket index will be resolving and hashmap fetches the values from the specific bucket if present if not it returns null.
+
+We make use of put method itself for the updation also, if the key already exists the value will be updated and the old value
+is returned if no key is already present then it adds to the buck and return null value.
+
+
+
